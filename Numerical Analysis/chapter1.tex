@@ -1,0 +1,133 @@
+% \documentclass[a4paper, 11pt, oneside, onecolumn, titlepage]{ctexrep}
+
+% \usepackage{makeidx,amsmath}
+% \usepackage{unicode-math}
+% \usepackage{setspace}
+% \usepackage{amsthm}
+% \usepackage{geometry}
+% \usepackage{fancyhdr}
+% \usepackage{tikz}
+
+% \geometry{left=25mm,right=25mm,top=30mm,bottom=30mm}
+% \setmathfont{XITS Math}
+
+% \linespread{1.5}
+% \title{Numerical Integration \& Numerical Differentiation}
+% \author{Brassicaaa}
+% \date{\today}
+
+% \setlength{\headheight}{27pt}
+
+% \begin{document}
+% \pagestyle{fancy}
+% \lhead{Notes for Numerical Analysis}
+% \setcounter{page}{1}
+% \pagenumbering{arabic}
+\chapter{绪论}
+
+	\textbf{现代研究方法包括：理论、实践、科学计算}
+
+	函数 $f(x)$ 在 $x_0$ 处的 $n$ 次 Taylor 多项式展开：
+	\begin{align}
+	P_{n}(x) &= \sum_{k=0}^n \frac{f^{(k)}(x_0)}{k!} (x-x_0)^k \notag \\
+	&= f(x_{0}) + \frac{f^{\prime}(x_0)}{1!}(x-x_0)+\dots + \frac{f^{(n)}(x_0)}{n!}(x-x_0)^n
+	\end{align}
+
+	误差：
+	\begin{align}
+	R_n(x) &= f(x) - P_n(x) \notag \\
+	&= \frac{f^{(n+1)}(\xi)}{(n+1)!} (x-x_0)^{n+1}
+	\end{align}
+
+
+\section{误差}
+	\textbf{误差的来源：模型误差、观测误差、截断误差、舍入误差}
+	
+	真实值：$x$ 
+	
+	测量值：$x^*$
+	
+	误差：$e^* = x^* - x$，$e^* > 0$ 近似值偏大，称为{\em 强近似值}，$e^* < 0$ 近似值偏小，称为{\em 弱近似值}
+	
+	误差限：$\varepsilon^*$，$\left| e^*\right| = \left| x^* - x\right| \le \varepsilon^*$
+	
+	\begin{spacing}{2.0}
+	相对误差：$e^*_r = \displaystyle{\frac{e^*}{x}\approx \frac{e^*}{x^*}}$ ($e_r^*$较小)
+	
+	相对误差限：$\varepsilon^*_r = \displaystyle{\frac{\varepsilon^*}{\left| x^* \right|}}$
+	\end{spacing}\newpage
+	
+	$n$位有效数字的标准写法：
+	\begin{equation}
+	x^* = \pm 10^m \times (a_1 +a_2\times 10^{-1}+\dots + a_n\times 10^{-(n-1)})
+	\end{equation}
+	
+	其误差限：
+	\begin{equation}
+	\varepsilon^* = \left| x^* - x\right| \le \frac{1}{2} \times 10^{m-n+1}
+	\end{equation}
+	
+	\newtheorem{mythm}{Theorem}[chapter]
+	\begin{mythm}
+	对具有 $n$ 位有效数字的 $x^*$其相对误差限为：
+	\begin{equation}
+	\varepsilon^*_r \le \frac{1}{2a_1} \times 10^{-(n-1)}
+	\end{equation}
+	\end{mythm}
+
+	定理1.1表明，有效数字位数越多，相对误差限越小。
+	
+	\textbf{和的误差是误差之和，差的误差是误差之差}
+	
+	\textbf{乘积的相对误差是各乘数的相对误差之和，商的相对误差是被除数与除数的相对误差之差}
+
+	\begin{proof}{\em
+	将 $x^*$ 的误差 $e^* = x^* - x$ 看作是对 $x$ 的微分：
+	\begin{equation}
+	\mathrm{d} x = x^* - x \notag
+	\end{equation}
+	
+	则 $x^*$ 的相对误差就为对数函数的微分：
+	\begin{equation}
+	e^*_r = \frac{x^* - x}{x} = \frac{\mathrm{d}x}{x}=\mathrm{dln}x \notag
+	\end{equation}
+	
+	设 $u=xy$，则 $\mathrm{ln}u = \mathrm{ln}x + \mathrm{ln}y$，故:
+	$$
+	\mathrm{dln}u = \mathrm{dln}x + \mathrm{dln}y \notag 
+	$$}
+	\end{proof}
+	\newpage
+	
+\section{注意事项}
+	\begin{enumerate}
+		\item \textbf{避免两个相近的数相减}
+		
+			设 $u=x-y$，则相对误差：
+			$$
+			\mathrm{dln}u = \frac{\mathrm{d}x -\mathrm{d}y}{x-y} \notag
+			$$
+			如果下 $x$ 和 $y$ 很接近，就会导致 $u$ 的相对误差很大。
+		
+		\begin{enumerate}
+		\begin{spacing}{2.2}
+			\item 当 $x \to 0$，$\displaystyle{\frac{1-\mathrm{cos}x}{\mathrm{sin}x} \rightleftharpoons \frac{\mathrm{sin}x}{1+\mathrm{cos}x}}$ 
+			
+			\item 当 $(x_1 - x_2) \to 0$，$\displaystyle{(\mathrm{lg}x_1 - \mathrm{lg}x_2) \rightleftharpoons \mathrm{lg}\frac{x_1}{x_2}}$
+			
+			\item 当 $x \to \infty$，$\displaystyle{\sqrt{x+1}-\sqrt{x}\rightleftharpoons \frac{1}{\sqrt{x+1}+\sqrt{x}}}$
+			
+			\item 当 $f(x) \approx f(x^*)$时，用 Taylor 级数展开：
+			{\setlength\abovedisplayskip{0cm}
+			\setlength\belowdisplayskip{0cm}
+			$$
+			f(x)-f(x^*) = f^{\prime}(x^*)(x-x^*) + \frac{f^{\prime \prime}(x^*)}{2!}(x-x^*)^2 + \dots \notag
+			$$}
+		\end{spacing}
+		\end{enumerate}
+		\item \textbf{防止大数吃掉小数}
+		\item \textbf{避免除数绝对值远远小于被除数绝对值的除法}
+		\item \textbf{简化运算步骤，较少运算次数}
+	\end{enumerate}
+
+% \end{document}

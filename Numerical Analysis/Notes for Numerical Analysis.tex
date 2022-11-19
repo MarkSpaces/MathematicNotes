@@ -1,0 +1,47 @@
+\documentclass[a4paper, 11pt, oneside, onecolumn, titlepage]{ctexrep}
+
+\usepackage{makeidx,amsmath}
+\usepackage{unicode-math}
+\usepackage{setspace}
+\usepackage{amsthm}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{mathrsfs} 
+
+\geometry{left=25mm,right=25mm,top=30mm,bottom=30mm}
+\setmathfont{XITS Math}
+
+\linespread{1.5}
+\title{Numerical Integration \& Numerical Differentiation}
+\author{Brassicaaa}
+\date{\today}
+
+\setlength{\headheight}{27pt}
+
+\begin{document}
+
+\maketitle 				% 标题页
+
+\tableofcontents 		% 目录
+\thispagestyle{empty}
+\newpage
+
+\pagestyle{fancy}
+\lhead{Notes for Numerical Analysis}
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+
+\include{chapter1}
+\include{chapter2}
+\include{chapter3}
+\include{chapter4}
+\include{chapter5}
+
+\printindex 				% 结束索引
+
+
+
+\end{document}

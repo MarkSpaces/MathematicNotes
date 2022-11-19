@@ -1,0 +1,601 @@
+% \documentclass[a4paper, 11pt, oneside, onecolumn, titlepage]{ctexrep}
+
+% \usepackage{makeidx,amsmath}
+% \usepackage{unicode-math}
+% \usepackage{setspace}
+% \usepackage{amsthm}
+% \usepackage{geometry}
+% \usepackage{fancyhdr}
+% \usepackage{tikz}
+
+% \geometry{left=25mm,right=25mm,top=30mm,bottom=30mm}
+% \setmathfont{XITS Math}
+
+% \linespread{1.5}
+% \title{Numerical Integration \& Numerical Differentiation}
+% \author{Brassicaaa}
+% \date{\today}
+
+% \setlength{\headheight}{27pt}
+
+% \begin{document}
+
+% \pagestyle{fancy}
+% \lhead{Notes for Numerical Analysis}
+% \setcounter{page}{1}
+% \pagenumbering{arabic}
+
+
+\chapter{函数的插值与逼近}
+	在线性空间 $C\ [a,b]$ 上， $f(x)\in C\  [a,b]$，已知 $f(x_i)=y_i\ (i=0,1,\dots ,n)$，用 $\displaystyle{\varphi (x) = \sum_{i=0}^n \alpha_i \varphi_i(x)}$近似$f(x)$。在给定插值条件：
+	\begin{equation}
+	\varphi(x_i)=y_i\ (i=0,1,\dots,n) \label{k1}
+	\end{equation}
+	的情况下，$\varphi(x)$ 是次数不超过 $n$ 的代数插值多项式：
+	\begin{equation}
+	\varphi(x) = a_0 + a_1 x + \dots + a_n x^n \label{k2}
+	\end{equation}
+	用 $H_n$ 表示所有次数不超过 $n$ 的多项式集合，则有 $\varphi (x) \in H_n$，满足如下定理：
+	\newtheorem{theorem}{Theorem}[chapter]
+		\begin{theorem}
+		满足插值条件 \ref{k1} 的插值多项式 \ref{k2} 存在且唯一。
+		\end{theorem}
+
+	\begin{proof}
+		形如 \ref{k2}的 $\varphi(x)$ 满足插值条件 \ref{k1} 可知：
+		\begin{equation}
+			\begin{cases}
+			\quad a_0 + a_1 x_0 + \dots + a_n x_0^n = y_0,\\
+			\quad a_0 + a_1 x_1 + \dots + a_n x_1^n = y_1,\\
+			\quad \dots \dots \dots \\
+			\quad a_0 + a_1 x_n + \dots + a_n x_n^n = y_n.
+			\end{cases}
+		\end{equation}
+		转化为证明该方程组解的存在唯一行问题，即行列式不为0。而该方程组的行列式是 Vandermonde 行列式：
+		\begin{align}
+		V_n(x_0,x_1,\dots,x_n) &= \left| \begin{array}{ccccc}
+				1 		& x_{0} 	& x_{0}^{2} & \dots 	& x_{0}^{n} \\
+				1		& x_{1} 	& x_{1}^{2} & \dots 	& x_{1}^{n} \\
+				\vdots 	& \vdots	& \vdots 	& \ddots 	& \vdots \\
+				1 		& x_{n} 	& x_{n}^{2} & \dots 	& x_{n}^{n} \\
+			\end{array} \right| \notag = \prod_{i=1}^n \prod_{j=0}^{i-1}(x_i-x_j) 
+		= \prod_{0 \le j<i \le n}(x_i-x_j) \notag
+		\end{align}
+		因节点 $x_i \neq x_j (i \neq j)$ 而不为0。
+	\end{proof}
+
+		\begin{theorem}[Rolle Law]
+		如果 $R$ 上的函数 $f(x)$ 满足以下条件：
+			\begin{enumerate}
+				\item 在闭区间 $[a,b]$ 上连续
+				\item 在开区间 $(a,b)$ 内可导
+				\item $f(a)=f(b)$
+			\end{enumerate}
+		则至少存在一个$\xi \in (a,b)$，使得 $f^{\prime}(\xi)=0$
+		\end{theorem}
+
+
+\section{Lagrange插值}
+	对于$n+1$个节点的函数插值，Lagrange采用$n$次插值基函数与节点函数值的乘积再求和来表示。插值条件：
+	\begin{align}
+		L_n(x_k) &= y_k \ (k = 1,2,\dots,n) \\
+		l_j(x_k) &= \delta_{jk} = 
+		\begin{cases}
+		1,\  k=j \\
+		0,\ k\neq j\\ \end{cases}
+		(j,k = 0,1,\dots,n)
+	\end{align}
+	$l(x)$称为$f(x)$的$n$次插值基函数，$L_n(x)$称为$f(x)$的$n$次Lagrange插值多项式，表示为：
+	\begin{equation}
+		L_n(x) = \sum_{i=0}^n y_i l_i(x)
+	\end{equation}
+
+	若记:
+	\begin{align}
+		\omega_{n+1}(x) &= (x-x_0)(x-x_1)\dots (x-x_n) \notag\\
+						&= \prod_{i=0}^n (x-x_i)\\
+		\omega_{n+1}^{\prime}(x_k) &= \prod_{i=0,i\neq k}^n(x_k-x_i)
+	\end{align}
+	
+	则：
+	\begin{align}
+		l_i(x) &= \frac{\omega_{n+1}(x)}{(x-x_i)\omega_{n+1}^{\prime}(x_i)}\quad (i=0,1,\dots,n)\\
+		L_n(x) &= \sum_{i=0}^n y_i \frac{\omega_{n+1}(x)}{(x-x_i)\omega_{n+1}^{\prime}(x_i)}
+	\end{align}
+
+	插值余项：
+	\begin{equation}
+		R_n(x) = f(x) - L_n(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!}\omega_{n+1}(x)\quad \xi = \xi(x)\in (a,b)
+	\end{equation}
+
+	余项估计：
+	$$
+	\left| R_n(x) \right| \leqslant \frac{M}{(n+1)!}\left| \omega_{n+1}(x)\right| 
+	$$
+
+	当$f^{\prime}(x)\in C[a,b]$时，可取$M= \max\limits_{a\leqslant x\leqslant b} \left|f^{(n+1)}(x)\right|$.
+
+	\begin{proof}
+		\begin{align}
+			\because \qquad R_n(x_i) &= f(x_i) - L_n(x_i) = 0 \notag \\
+			\therefore \quad \text{设}\ R_n(x) &= k(x)(x-x_0)(x-x_1)\dots(x-x_n)\notag \\
+			\		&= k(x)\omega_{n+1}(x)\notag
+		\end{align}
+
+		将$x$（不为插值节点）视为$[a,b]$上一个固定点，做辅助函数：
+		\begin{align}
+			\varphi(t) &= R_n(t)-k(x)\omega_{n+1}(t) \notag \\
+			&= f(t)-L_n(t)-k(x)(t-x_0)(t-x_1)\dots(t-x_n) \notag
+		\end{align}
+
+		根据插值条件和余项定义知$\varphi$有$n+2$个零点$\{ x_0,x_1,\dots,x_n,x \}$，由Rolle定理知$\varphi^{(n+1)}$在$(a,b)$内至少有1个零点，记该零点为$\xi,\  \xi(x)\in (a,b)$，使得：
+		$$
+		\varphi^{(n+1)}(\xi) = f^{(n+1)}(\xi) - (n+1)!k(x)=0
+		$$
+
+		则：
+		$$
+		k(x)=\frac{f^{(n+1)}(\xi)}{(n+1)!},\quad \xi = \xi(x)\in(a,b)
+		$$
+	\end{proof}
+
+	
+\newpage
+\section{Iteration插值}
+	\textbf{两个$m$次插值多项式通过线性插值可得到一个$m+1$次的插值多项式。}
+	
+	Aitken逐次线性插值公式：
+	\begin{equation}
+	P_{0,1,\dots,m,l}(x) = P_{0,1,\dots,m}(x) + \frac{P_{0,1,\dots,m-1,l}(x) - P_{0,1,\dots,m}(x)}{x_l - x_m}(x-x_m)
+	\end{equation}
+	
+	Neville算法:
+	\begin{equation}
+	P_{0,1,\dots,m+1}(x) = P_{0,1,\dots,m}(x) + \frac{P_{1,2,\dots,m+1}(x) - P_{0,1,\dots,m}(x)}{x_{m+1} - x_0}(x-x_0)
+	\end{equation}
+
+	验证(Aitken公式)：
+	
+	当$i=0,1,\dots,m-1$时：
+	$$
+	P_{0,1,\dots,m,l}(x_i) = P_{0,1,\dots,m}(x_i) = f(x_i)
+	$$
+
+	当$i=m$时：
+	$$
+	P_{0,1,\dots,m,l}(x_i) = P_{0,1,\dots,m}(x_m) = f(x_m)
+	$$	
+
+	当$i=l$时：
+	\begin{align}
+	P_{0,1,\dots,m,l}(x_i) &= P_{0,1,\dots,m}(x_l) + \frac{f(x_l)-P_{0,1,\dots,m}(x_l)}{x_l-x_m}(x_l-x_m)\notag \\
+	&= f(x_l) \notag
+	\end{align}
+
+
+\newpage
+\section{Newton插值}
+\subsection{Newton均差}
+定义零阶均差：
+$$
+f[x_i] = f(x_i)
+$$
+
+一阶均差：
+$$
+f[x_i, x_{i+1}] = \frac{f[x_{i+1}]-f[x_i]}{x_{i+1} - x_i}
+$$
+
+$k$阶均差：
+$$
+f[x_i, x_{i+1},\dots, x_{i+k}] = \frac{f[x_{i+1},x_{i+2},\dots,x_{i+k}]-f[x_i,x_{i+1},\dots,x_{i+k-1}]}{x_{i+k} - x_i}
+$$
+
+\begin{theorem} 
+	均差有如下基本性质：
+	\begin{enumerate}
+		\item 均差可以表示为函数的线性组合
+			$$
+			f[x_0,x_1,\dots,x_n] = \sum_{j=0}^n \frac{f(x_j)}{(x_j-x_0)(x_j-x_1)\dots (x_j-x_{j-1})(x_j-x_{j+1})\dots (x_j-x_n)}
+			$$
+		\item 均差所含节点对称（与排列次序无关）
+			\begin{align}
+			f[x_0,x_1,\dots,x_n] &= f[x_1,x_0,x_2,\dots,x_n] \\
+			f[x_0,x_1,\dots,x_k] &= \frac{f[x_0,\dots,x_{k-2},x_k] - f[x_0,x_1,\dots,x_{k-1}]}{x_k - x_{k-1}}
+			\end{align}
+		\begin{spacing}{2.0}
+		\item 均差与导数的关系：设$f$在$[a,b]$上的$n$阶导数存在，且$x_0,x_1,\dots,x_n \in [a,b]$，则存在$\xi \in (a,b)$，使得
+			\begin{equation}
+			f[x_0,x_1,\dots,x_n] = \frac{f^{(n)}(\xi)}{n!}
+			\end{equation}
+		\end{spacing}
+	\end{enumerate}
+\end{theorem}
+
+
+将直线的点斜式方程：
+$$
+P_1(x) = f(x_0) + \frac{f(x_1) - f(x_0)}{x_1 - x_0}(x-x_0)
+$$
+
+推广到$n+1$个插值节点$(x_0,y_0)(x_1,y_1)\dots (x_n,y_n)$情形：
+\begin{equation}
+P_n(x) = a_0 + a_1(x-x_0)+a_2(x-x_0)(x-x_1)+\dots +a_n(x-x_0)\dots(x-x_{n-1})
+\end{equation}
+\begin{theorem}
+若形如$P_n(x)$的$n$次多项式$N_n(x)$满足插值条件：
+	\begin{equation}
+	N_n(x_i) = f(x_i)\quad (i=0,1,\dots,n)
+	\end{equation}
+则：
+	\begin{equation}
+	N_n(x) = f[x_0] + f[x_0,x_1](x-x_0) + \dots + f[x_0,\dots,x_n](x-x_0)\dots(x-x_{n-1})
+	\end{equation}
+余项：
+	\begin{align}
+	R_n(x) &= f(x) - N_n(x) \notag \\
+	&= f[x,x_0,x_1,\dots,x_n]\omega_{n+1}(x)
+	\end{align}
+\end{theorem}
+
+
+\subsection{Newton差分}
+
+Ignore it...
+
+
+\newpage
+\section{Hermite插值}
+一般地，给定$n+1$个节点上的函数值和一阶导数值：$f(x_i)=y_i,\ f^{\prime}(x_i)=m_i,\ (i=0,1,\dots,n)$，则可以构造出$2n+1$次的标准Hermite插值多项式$H_{2n+1}(x)$满足插值条件：
+\begin{enumerate}
+	\item $H_{2n+1}(x)$是不超过$2n+1$次的代数多项式；
+	\item $H_{2n+1}(x_i) = y_i,\quad H^{\prime}_{2n+1}(x_i) = m_i,\qquad (i=0,1,\dots,n)$
+\end{enumerate}
+
+其基函数:	
+\begin{equation}
+	\begin{cases}
+	\alpha_j(x)= [1-2(x-x_j)\sum\limits_{\substack{k=0\\ k\neq j}}\limits^n\frac{1}{x_j - x_k}]l_j^2(x)\\
+	\beta_j(x)= (x-x_j)l_j^2(x)\quad (j=0,1,\dots,n)
+	\end{cases}
+\end{equation}
+
+标准Hermite插值多项式：
+\begin{equation}
+H_{2n+1}(x) = \sum\limits_{j=0}\limits^n [a_j f(x_j) + \beta_j f^{\prime}(x_j)]
+\end{equation}
+
+插值余项：
+\begin{equation}
+R_{2n+1}(x) = f(x) - H_{2n+1}(x) = \frac{f^{(2n+2)}(\xi)}{(2n+2)!}\omega_{n+1}^2(x)
+\end{equation}
+
+特别地，当$n=1$，即给定两个节点$x_i,x_i+1$的函数值和一阶导数值：
+\begin{align}
+\alpha_i(x) &= (1+2\frac{x-x_i}{x_{i+1}-x_i})(\frac{x-x_{i+1}}{x_i - x_{i+1}})^2 \notag 
+\\[4mm]
+\alpha_{i+1}(x) &= (1+2\frac{x-x_{i+1}}{x_i-x_{i+1}})(\frac{x-x_i}{x_{i+1} - x_i})^2 \notag 
+\\[4mm]
+\beta_i(x) &= (x-x_i)(\frac{x-x_{i+1}}{x_i-x_{i+1}})^2 \notag 
+\\[4mm]
+\beta_{i+1}(x) &= (x-x_{i+1})(\frac{x-x_i}{x_{i+1}-x_i})^2 \notag
+\end{align}
+
+{\em 唯一性的证明可设$H_3(x), \bar{H}_3(x)$都满足插值条件，作辅助函数$g(x)=H_3(x) - \bar{H}_3(x)$，因为$g(x)$存在2个二阶零点，与插值条件中次数不超过三次相矛盾，故$g(x) \equiv 0$.}
+
+
+\newpage
+\section{分段多项式插值}
+\subsection{Segmented Linear Interpolation}
+定义$f(x)$是区间$[a,b]$上的函数，已知$f(x)$在节点$a=x_0<x_1<\dots <x_n=b$上的函数值$f_0,f_1,\dots,f_n$，记$h_k=x_{k+1}-x_k,\ h=\max\limits_{0\leqslant k\leqslant n-1}h_k$，如果函数$I_h(x)$满足条件：
+\begin{enumerate}
+	\item $I_h(x) \in C^0[a,b]$
+	\item $I_h(x_k) = f_k\quad (k=0,1,\dots,n)$
+	\item 在每个子区间$[x_k,x_{k+1}]$上，$I_h(x)$是线性多项式
+\end{enumerate}
+则称$I_h(x)$为$f(x)$的\textbf{分段线性插值函数}，其形式为:
+\begin{equation}
+I_h(x) = \sum\limits_{k=0}^n f_k l_{h,k}(x)
+\end{equation}
+它在子区间$[x_k,x_{k+1}]$上的形式为：
+\begin{equation}
+I_h(x) = f_k(\frac{x-x_{k+1}}{x_k-x_{k+1}})+f_{k+1}(\frac{x-x_k}{x_{k+1}-x_k})\quad x\in [x_k,x_{k+1}]
+\end{equation}
+利用线性插值的余项可得分段线性插值函数的余项估计：
+\begin{equation}
+\left| R(x)\right| = \left| f(x) - I_h(x) \right| \leqslant \frac{h^2}{8}M
+\end{equation}
+其中，$M=\max\limits_{a\leqslant x\leqslant b}\left| f^{\prime \prime}(x)\right|$.
+
+
+\subsection{Segmented Three-Hermite Interpolation}
+定义$f(x)$是区间$[a,b]$上的函数，已知$f(x)$在节点$a=x_0<x_1<\dots <x_n=b$上的函数值$f_0,f_1,\dots,f_n$，导数值为$f^{\prime}(x_k)=m_k\ (k=0,1,\dots,n),\ h=\max\limits_{0\leqslant k\leqslant n-1}(x_{k+1}-x_k)$，如果函数$I_h(x)$满足条件：
+\begin{enumerate}
+	\item $I_h(x) \in C^1[a,b]$
+	\item $I_h(x_k) = f_k,\ I_h^{\prime}(x_k) = m_k\quad (k=0,1,\dots,n)$
+	\item 在每个子区间$[x_k,x_{k+1}]$上，$I_h(x)$是三次多项式
+\end{enumerate}
+则称$I_h(x)$为$f(x)$的\textbf{分段三次Hermite插值函数}，其形式为:
+\begin{equation}
+I_h(x) = \sum\limits_{k=0}^n [\alpha_k(x)f_k + \beta_k(x)m_k]
+\end{equation}
+它在子区间$[x_k,x_{k+1}]$上的形式为：
+\begin{equation}
+I_h(x) = \alpha_k(x)f_k + \alpha_{k+1}(x)f_{k+1} + \beta_k(x)m_k + \beta_{k+1}(x)m_{k+1}
+\end{equation}
+余项估计：
+\begin{equation}
+\left| R(x)\right| = \left| f(x) - I_h(x) \right| \leqslant \frac{h^4}{384}M_4
+\end{equation}
+其中，$M_4 = \max\limits_{x\in [a,b]}\left| f^{(4)}(x)\right|$.同时还有下式成立：
+\begin{theorem}
+	\begin{align}
+	\| D(f-I_h)\|_\infty \leqslant \frac{\sqrt{3}}{216}h^3\|D^4f\|_\infty 
+	\\[4mm]
+	\| D^2(f-I_h)\|_\infty \leqslant \frac{\sqrt{1}}{12}h^2\|D^4f\|_\infty 
+	\\[4mm]
+	\| D^3(f-I_h)\|_\infty \leqslant \frac{\sqrt{1}}{12}h\|D^4f\|_\infty
+	\end{align}
+这里$D^i(i=1,2,3,4)$表示$i$阶微分算子，$\|f\|_\infty = \max\limits_{x\in[a,b]}\left| f(x)\right|$.
+\end{theorem}
+
+
+\newpage
+\section{Spline插值}
+\subsection{Define Function}
+设$a=x_0<x_1<\dots <x_n=b$为区间$[a,b]$上给定的一个划分，若函数$s(x)$满足下列条件：
+\begin{enumerate}
+	\item $s(x) \in C^2[a,b]$
+	\item 在每个子区间$[x_k,x_{k+1}]\ (k=0,1,\dots,n-1)$上，$s(x)$是三次多项式
+\end{enumerate}
+则称$s(x)$为关于节点$x_0,x_1,\dots,x_n$的\textbf{三次样条函数}，若进一步满足插值条件：
+\begin{enumerate}
+	\item[3.] $s(x_k) = f(x_k) = y_k\quad (k=0,1,\dots,n)$
+\end{enumerate}
+则称$s(x)$\textbf{为三次样条插值函数}。
+
+
+每个区间上是三次多项式需要确定4个参数，则$s(x)$一共需要确定$4n$个参数。根据$n+1$个插值点以及中间$(n-1)$个点的连续性可确定$4n-2$个参数，还需要两个条件，可分为三种情况：
+
+\begin{enumerate}
+	\item \textbf{已知两端点处的一阶导数值,称为固支边界条件}
+		\begin{equation}
+		s^{\prime}(x_0) = f_0^{\prime} = f^{\prime}(x_0),\quad s^{\prime}(x_n) = f_n^{\prime} = f^{\prime}(x_n)
+		\end{equation}
+	\item \textbf{已知两端点处的二阶导数值}
+		\begin{equation}
+		s^{\prime \prime}(x_0) = f_0^{\prime \prime} = f^{\prime \prime}(x_0),\quad s^{\prime \prime}(x_n) = f_n^{\prime \prime} = f^{\prime \prime}(x_n)
+		\end{equation}
+	当特殊情形时：
+		\begin{equation}
+		s^{\prime \prime}(x_0) = s^{\prime \prime}(x_n) = 0
+		\end{equation}
+	称为\textbf{自然边界条件}
+	\item \textbf{当$f(x)$是以$x_n-x_0$为周期的周期函数时，称为周期边界条件}
+		\begin{equation}
+		s^{(k)}(x_0+0) = s^{(k)}(x_n-0)\quad (k=0,1,2)
+		\end{equation}
+\end{enumerate}
+\newpage
+
+
+\subsection{Construct Function}
+\begin{enumerate}
+\item 三转角方程
+
+由Hermite插值，记$h_k = x_{k+1} - x_k$，则$s(x)$在区间$[x_k,x_{k+1}]$上为：
+\begin{align}
+s(x) &= \frac{(x-x_{k+1})^2 [h_{k}+2(x-x_{k})]}{h_{k}^3}y_{k}+\frac{(x-x_{k})^2 [h_{k}+2(x_{k+1}-x)]}{h_{k}^3}y_{k+1}\\
+&+\frac{(x-x_{k+1})^2(x-x_k)}{h_k^2}m_k + \frac{(x-x_{k})^2(x-x_{k+1})}{h_k^2}m_{k+1}
+\end{align}
+
+计算:
+\begin{align}
+h_k &= x_{k+1} - x_k 
+\\[4mm]
+f[x_k,x_{k+1}] &= \frac{y_{k+1} - y_k}{h_k} 
+\\[4mm]
+\lambda_k &= \frac{h_k}{h_{k-1}+h_k} 
+\\[4mm]
+\mu_k &= \frac{h_{k-1}}{h_{k-1}+h_k} 
+\\[4mm]
+e_k &= 3(\lambda_k f[x_{k-1},x_k] + \mu_k f[x_k,x_{k+1}])
+\end{align}
+
+\begin{enumerate}
+	\item 若给定固支边界条件，则$m_0,m_n$已知，仅有$m_1,m_2,\dots,m_{n-1}$共$4n-1$个未知数组成方程组：
+		\begin{equation}
+			\begin{bmatrix}
+			2 & \mu_1 &0 &\dots &0 &0 &0 \\
+			\lambda_2 &2 &\mu_2 &\dots &0 &0 &0 \\
+			0 &\lambda_3 &2 &\dots &0 &0 &0 \\
+			\vdots &\vdots &\vdots &\  &\vdots &\vdots &\vdots \\
+			0 &0 &0 &\dots &\lambda_{n-2} &2 &\mu_{n-2} \\
+			0 &0 &0 &\dots &0 &\lambda_{n-1} &2
+			\end{bmatrix}
+			\begin{bmatrix}
+			m_1\\ m_2\\ m_3\\ \vdots \\ m_{n-2}\\ m_{n-1}
+			\end{bmatrix}
+			=
+			\begin{bmatrix}
+			e_1-\lambda_1f_0^{'}\\ e_2\\ e_3\\ \vdots \\ e_{n-2}\\ e_{n-1}
+			\end{bmatrix}
+		\end{equation}
+
+	\item 若给定自然边界条件，则$e_0=3f[x_0,x_1],\ e_n=3f[x_{n-1},x_n]$已知，则：
+		\begin{equation}
+			\begin{bmatrix}
+			2 &1 &0 &\dots &0 &0 &0 \\
+			\lambda_1 &2 &\mu_1 &\dots &0 &0 &0 \\
+			0 &\lambda_2 &2 &\dots &0 &0 &0 \\
+			\vdots &\vdots &\vdots &\  &\vdots &\vdots &\vdots \\
+			0 &0 &0 &\dots &\lambda_{n-1} &2 &\mu_{n-1} \\
+			0 &0 &0 &\dots &0 &1 &2
+			\end{bmatrix}
+			\begin{bmatrix}
+			m_0\\ m_1\\ m_2\\ \vdots \\ m_{n-1}\\ m_{n}
+			\end{bmatrix}
+			=
+			\begin{bmatrix}
+			e_0\\ e_1\\ e_2\\ \vdots \\ e_{n-1}\\ e_{n}
+			\end{bmatrix}
+		\end{equation}
+		 在非特殊情形时，第二类边界条件是：
+		\begin{equation}
+			\begin{cases}
+			2m_0 + m_1 = 3f[x_0,x_1] - \frac{h_0}{2}f_0^{\prime \prime} \triangleq e_0 \\
+			m_{n-1} + 2m_n = 3f[x_{n-1},x_n] + \frac{h_{n-1}}{2}f_n^{\prime \prime} \triangleq e_n
+			\end{cases}
+		\end{equation}
+
+	\item 若给定周期边界条件，$m_0 = m_n,\  \mu_n m_1 + \lambda_n m_{n-1} + 2m_n = e_n$，此处$\mu_n = \frac{h_{n-1}}{h_0 + h_{n-1}},\ \lambda_n = \frac{h_0}{h_0+h_{n-1}},\ e_n = 3(\mu_n f[x_0,x_1] + \lambda_n f[x_{n-1},x_n])$，则：
+		\begin{equation}
+			\begin{bmatrix}
+			2 &\mu_1 &0 &\dots &0 &0 &\lambda_1 \\
+			\lambda_2 &2 &\mu_2 &\dots &0 &0 &0 \\
+			\vdots &\vdots &\vdots &\  &\vdots &\vdots &\vdots \\
+			0 &0 &0 &\dots &\lambda_{n-1} &2 &\mu_{n-1} \\
+			\mu_n &0 &0 &\dots &0 &\lambda_n &2
+			\end{bmatrix}
+			\begin{bmatrix}
+			m_1\\ m_2\\ \vdots \\ m_{n-1}\\ m_{n}
+			\end{bmatrix}
+			=
+			\begin{bmatrix}
+			e_1\\ e_2\\ \vdots \\ e_{n-1}\\ e_{n}
+			\end{bmatrix}
+		\end{equation}
+\end{enumerate}
+
+\item 三弯矩方程:略
+\end{enumerate}
+\newpage
+
+
+\section{最小二乘拟合}
+
+对$(x_k,y_k)\ (k=1,\dots,n)$共$n$个数据点，不要求拟合曲线$\varphi(x)$通过所有数据点，但要反映$f(x_i)$的总体特征，一般用误差$\delta_i = y(x_i) - y_i$衡量$\varphi(x)$的好坏，常用\textbf{最小二乘原理}$\sum\limits_i\delta_i^2$达到最小来确定参数。
+
+\begin{enumerate}
+\item \textbf{一次函数拟合$y=ax+b$.}
+	记：
+	\begin{equation}
+	\varphi(a,b) =  \sum\limits_{i=1}\limits^{n}\delta_i^2 = \sum\limits_{i=1}\limits^{n}(ax_i+b-y_i)^2
+	\end{equation}
+	\begin{enumerate}
+		\item 通过微积分方法求解\textbf{正规方程组}:
+		\begin{equation}
+			\begin{cases}
+			{\displaystyle \frac{\partial \varphi(a,b)}{\partial a} = 0} \\[3mm]
+			{\displaystyle \frac{\partial \varphi(a,b)}{\partial b} = 0}
+			\end{cases}
+		\end{equation}
+	
+		\item 通过矩阵方法写出\textbf{矛盾方程组}：
+		\begin{equation}
+		\boldsymbol{Ax} = \boldsymbol{b}
+		\end{equation}
+	
+		其中：
+		$$
+		A = \begin{bmatrix}	x_1 & 1 \\ x_2 & 1 \\ \vdots & \vdots\\ x_n & 1 \end{bmatrix},\ 
+		x = \begin{bmatrix} a \\ b \end{bmatrix},\ 
+		b = \begin{bmatrix}	y_1 \\ y_2 \\ \vdots \\ y_n \end{bmatrix}
+		$$
+	
+		则相应的正规方程组为：
+		\begin{equation}
+			\boldsymbol{A}^T\boldsymbol{Ax} = \boldsymbol{A}^T\boldsymbol{b}
+		\end{equation}
+	
+		即可求出待定参数$a$和$b$.
+	\end{enumerate}
+
+\item \textbf{二次函数拟合$y=ax^2 + bx + c$.}
+	\begin{equation}
+	\varphi(a,b,c) =  \sum\limits_{i=1}\limits^{n}\delta_i^2 = \sum\limits_{i=1}\limits^{n}(ax_i^2+bx_i+c-y_i)^2
+	\end{equation}
+	\begin{enumerate}
+		\item 通过微积分方法求解\textbf{正规方程组}:
+		\begin{equation}
+			\begin{cases}
+			{\displaystyle \frac{\partial \varphi(a,b,c)}{\partial a} = 0} \\[3mm]
+			{\displaystyle \frac{\partial \varphi(a,b,c)}{\partial b} = 0} \\[3mm]
+			{\displaystyle \frac{\partial \varphi(a,b,c)}{\partial c} = 0}
+			\end{cases}
+		\end{equation}
+	
+		\item 通过矩阵方法写出\textbf{矛盾方程组}：
+		$$
+		A = \begin{bmatrix}	x_1^2 &x_1 &1\\ x_2^2 &x_2 &1 \\ \vdots &\vdots & \vdots\\ x_n^2 &x_n &1 \end{bmatrix},\ 
+		x = \begin{bmatrix} a \\ b \\c \end{bmatrix},\ 
+		b = \begin{bmatrix}	y_1 \\ y_2 \\ \vdots \\ y_n \end{bmatrix}
+		$$
+	
+		相应的正规方程组：
+		$$
+		\boldsymbol{A}^T\boldsymbol{Ax} = \boldsymbol{A}^T\boldsymbol{b}
+		$$
+	
+		即可求出待定参数$a,b,c$.
+	\end{enumerate}
+
+\item \textbf{一般情形最小二乘拟合}
+	
+	将线性多项式系$\{1,x\}$进行推广，对已知数据为$\{(x_j,y_j)\}_{j=0}^m$的集合，取函数类为$\varPhi = \text{Span}\{\varphi_0,\varphi_1,\dots,\varphi_n \}(n<m)$，求$y=F^*(x)\in \varPhi$，使得误差平方和为：
+	\begin{equation}
+	\sum\limits_{j=0}\limits^m\delta_j^2 = \sum\limits_{j=0}\limits^m [F^*(x_j) - y_j]^2 = \min\limits_{F(x)\in \varPhi}\sum\limits_{j=0}\limits^m [F(x_j) - y_j]^2
+	\end{equation}
+	
+	此处$F(x)$的形式为基函数$\varphi_0,\varphi_1,\dots,\varphi_n$的线性组合：
+	\begin{equation}
+	F(x) = \sum\limits_{j=0}\limits^n C_j \varphi_j(x)
+	\end{equation}
+
+	若用欧式范数的平方来表示误差的平方和，考虑不同点的权重$\omega(x_j)$，则有：
+	\begin{equation}
+	\| \boldsymbol{\delta} \|_2 ^2 = \min\limits_{F(x)\in \varPhi}\sum\limits_{j=0}\limits^m \omega(x_j)[F(x_j)-y_j]^2,\quad \omega(x_j) \geqslant 0
+	\end{equation}
+
+	等价于求如下多元函数：
+	\begin{equation}
+	I(C_0,C_1,\dots,C_n) = \sum\limits_{j=0}\limits^m\omega(x_j)[\sum\limits_{i=0}\limits^n C_i \varphi_i(x_j) - y_j]^2
+	\end{equation}
+
+	的极小值点问题，各个参数的一阶偏导数为零，得到$n+1$个方程构成的正规方程组：
+	\begin{equation}
+	\frac{\partial I}{\partial C_k} = 2\sum\limits_{j=0}\limits^m\omega(x_j)[\sum\limits_{i=0}\limits^n C_i \varphi_i(x_j) - y_j]\varphi_k(x_j) = 0 \quad (k=0,1,\dots,n)
+	\end{equation}
+
+	若引入记号：
+	\begin{align}
+	(\varphi_i,\varphi_k) &= \sum\limits_{j=0}\limits^m\omega(x_j)\varphi_i(x_j)\varphi_k(x_j)\notag \\
+	b_k& = \sum\limits_{j=0}\limits^m\omega(x_j)y_j\varphi_k(x_j),\ (k=0,1,\dots,n)\notag
+	\end{align}
+
+	可简化为：
+	\begin{equation}
+	\sum\limits_{i=0}\limits^n(\varphi_k,\varphi_i)C_i = b_k \quad (k=0,1,\dots,n)
+	\end{equation}
+
+	其矩阵形式：
+	\begin{equation}
+	\boldsymbol{G}_n\boldsymbol{C} = \boldsymbol{b} \\
+	\end{equation}
+	
+	其中$\boldsymbol{G}_n$为离散Gram矩阵：
+	$$
+	\boldsymbol{G}_n = \begin{bmatrix}
+	(\varphi_0,\varphi_0) & (\varphi_0,\varphi_1) & \dots & (\varphi_0,\varphi_n) \\
+	(\varphi_1,\varphi_0) & (\varphi_1,\varphi_1) & \dots & (\varphi_1,\varphi_n) \\
+	\vdots &\vdots &\  &\vdots \\ 
+	(\varphi_n,\varphi_0) & (\varphi_n,\varphi_1) & \dots & (\varphi_n,\varphi_n) \end{bmatrix},\quad
+	\boldsymbol{C} = \begin{bmatrix}C_0 \\ C_1 \\ \dots \\ \c_n \end{bmatrix}^T, \quad \boldsymbol{b}=\begin{bmatrix} b_0 \\ b_1 \\ \dots \\ \b_n \end{bmatrix}^T
+	$$
+	
+\end{enumerate}
+
+
+
+
+% \end{document}

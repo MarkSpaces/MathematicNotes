@@ -1,0 +1,52 @@
+\contentsline {chapter}{\numberline {第一章\hspace {.3em}}绪论}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}误差}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}注意事项}{3}{section.1.2}%
+\contentsline {chapter}{\numberline {第二章\hspace {.3em}}函数的插值与逼近}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Lagrange插值}{5}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Iteration插值}{7}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Newton插值}{8}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Newton均差}{8}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Newton差分}{9}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Hermite插值}{10}{section.2.4}%
+\contentsline {section}{\numberline {2.5}分段多项式插值}{11}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Segmented Linear Interpolation}{11}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Segmented Three-Hermite Interpolation}{11}{subsection.2.5.2}%
+\contentsline {section}{\numberline {2.6}Spline插值}{13}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Define Function}{13}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Construct Function}{14}{subsection.2.6.2}%
+\contentsline {section}{\numberline {2.7}最小二乘拟合}{16}{section.2.7}%
+\contentsline {chapter}{\numberline {第三章\hspace {.3em}}数值积分与数值微分}{19}{chapter.3}%
+\contentsline {section}{\numberline {3.1}数值积分的概念}{19}{section.3.1}%
+\contentsline {section}{\numberline {3.2}插值型数值积分公式}{20}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Lagrange Integral Formula}{20}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Equidistent Integral Formula}{20}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Other Simple Integral Formula}{30}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}Gauss型数值积分公式}{31}{section.3.3}%
+\contentsline {section}{\numberline {3.4}数值微分}{35}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Taylor级数展开法}{35}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}数值微分的隐格式}{36}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}插值型求导公式}{36}{subsection.3.4.3}%
+\contentsline {chapter}{\numberline {第四章\hspace {.3em}}解线性方程组-直接法}{38}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Gauss消去法}{38}{section.4.1}%
+\contentsline {section}{\numberline {4.2}主元素消元法}{40}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}全主元素消元法}{40}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}列主元素消元法}{40}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}矩阵三角解法}{41}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Doolittle分解（LU分解）}{41}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}列主元素三角分解法}{43}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}平方根法}{43}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}三对角方程组的追赶法}{44}{subsection.4.3.4}%
+\contentsline {section}{\numberline {4.4}向量范数、矩阵范数、条件数}{46}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}向量范数、矩阵范数、谱半径}{46}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}矩阵条件数及方程组性态*}{48}{subsection.4.4.2}%
+\contentsline {chapter}{\numberline {第五章\hspace {.3em}}解线性方程组-迭代法}{49}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Jacobi迭代法}{49}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}迭代构造}{49}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}收敛性}{50}{subsection.5.1.2}%
+\contentsline {section}{\numberline {5.2}Gauss-Seidel迭代法}{51}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}迭代构造}{51}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}收敛性}{52}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}超松弛迭代法}{53}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}迭代构造}{53}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}收敛性}{53}{subsection.5.3.2}%
+\contentsline {section}{\numberline {5.4}共轭梯度法*}{56}{section.5.4}%

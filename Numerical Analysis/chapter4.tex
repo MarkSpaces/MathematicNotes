@@ -1,0 +1,541 @@
+% \documentclass[a4paper, 11pt, oneside, onecolumn, titlepage]{ctexrep}
+
+% \usepackage{makeidx,amsmath}
+% \usepackage{unicode-math}
+% \usepackage{setspace}
+% \usepackage{amsthm}
+% \usepackage{geometry}
+% \usepackage{fancyhdr}
+% \usepackage{tikz}
+
+% \geometry{left=25mm,right=25mm,top=30mm,bottom=30mm}
+% \setmathfont{XITS Math}
+
+% \linespread{1.5}
+% \title{Numerical Integration \& Numerical Differentiation}
+% \author{Brassicaaa}
+% \date{\today}
+
+% \setlength{\headheight}{27pt}
+
+% \begin{document}
+% \pagestyle{fancy}
+% \lhead{Notes for Numerical Analysis}
+% \setcounter{page}{1}
+% \pagenumbering{arabic}
+
+\chapter{解线性方程组-直接法}
+
+\section{Gauss消去法}
+
+对线性代数方程组：
+\begin{equation*}
+    \boldsymbol{Ax} = \boldsymbol{b}
+\end{equation*}
+
+其中，系数矩阵$\boldsymbol{A} = (a_{ij})_{n\times n}$非奇异，$\boldsymbol{x}=(x_1,x_2,\dots,x_n)^{T}$，右端项$\boldsymbol{b}=(b_1,b_2,\dots,b_n)^T$。
+
+\textbf{Gauss消去法}的基本思想是将方程组转化为上三角形方程组，然后进行求解，包括\textbf{消元}和\textbf{回代}两大过程：
+\begin{enumerate}
+    \item \textbf{消元过程}：记初始方程组为$\boldsymbol{A}^{(1)}\boldsymbol{x} = \boldsymbol{b}^{(1)}$，用第一行方程与剩下每行方程分别做线性运算消去第$2$至$n$行的方程中的$x_1$项，得到$\boldsymbol{A}^{(2)}\boldsymbol{x}=\boldsymbol{b}^{(2)}$：
+    \begin{align*}
+        a_{11}^{(1)}x_1 + a_{12}^{(1)}x_2 + \dots + a_{1n}^{(1)} &= b_1^{(1)} \\
+        a_{22}^{(2)}x_2 + \dots + a_{2n}^{(2)}x_n &= b_2^{(2)} \\
+        \cdots \cdots & \cdots \cdots \\
+        a_{n2}^{(2)}x_2 + \dots + a_{nn}^{(2)}x_n &= b_n^{(2)}
+    \end{align*}
+    然后用第二行与剩下$3$至$n$行分别做线性运算消去方程中的$x_2$项，得到$\boldsymbol{A}^{(3)}\boldsymbol{x}=\boldsymbol{b}^{(3)}$；
+    以此类推，完成第$n-1$步后得到上三角矩阵$\boldsymbol{A}^{(n)}\boldsymbol{x}=\boldsymbol{b}^{(n)}$：
+    \begin{align*}
+        a_{11}^{(1)}x_1 + a_{12}^{(1)}x_2 + a_{13}^{(1)}x_3 + \dots + a_{1n}^{(1)} &= b_1^{(1)} \\
+        a_{22}^{(2)}x_2 + a_{23}^{(2)}x_3 + \dots + a_{2n}^{(2)}x_n &= b_2^{(2)} \\
+        a_{33}^{(3)}x_3 + \dots + a_{3n}^{(3)}x_n &= b_2^{(3)} \\
+        \cdots \cdots & \cdots \cdots \\
+        a_{nn}^{(2)}x_n &= b_n^{(n)}
+    \end{align*}
+    该过程的求解公式如下：
+    \begin{equation}
+        \begin{cases}
+            \ l_{ik} &= a_{ik}^{(k)} / a_{kk}^{(k)} \quad (i=k+1,k+2,\dots,n) \\[3mm]
+            \ a_{ij}^{(k+1)} &= a_{ij}^{(k)} - l_{ik}a_{kj}^{(k)} \quad (i,j = k+1,k+2,\dots,n) \\[3mm]
+            \ b_i^{(k+1)} &= b_i^{(k)} - l_{ik}b_k^{(k)} \quad (i=k+1,k+2,\dots,n)
+        \end{cases}
+    \end{equation}
+
+    \item \textbf{回代过程}：当$a_{nn}^{(n)}\neq 0$时，从下往上代入方程求解即可，该上三角方程组的求解公式如下：
+    \begin{equation}
+        \begin{cases}
+            \ x_n = b_n^{(n)} / a_{nn}^{(n)} \\[3mm]
+            \ x_k = [b_k^{(k)} - \sum\limits_{j=k+1}^{n} a_{kj}^{(k)} x_j] / a_{kk}^{(k)} \quad (k=n-1,n-2,\dots,1)
+        \end{cases}
+    \end{equation}
+\end{enumerate}
+
+Gauss消去法的运算量比Gramer法则解方程组小得多，实现这一过程的充要条件是主元素$a_{ii}^{(i)} \neq 0\ (i=1,2,\dots,n-1)$。这一条件与原方程组的系数矩阵$\boldsymbol{A}$的联系有如下定理：
+\newtheorem{th4}{Theorem}[chapter]
+\begin{th4}
+    主元素$a_{ii}^{(i)} \neq 0\ (i=1,2,\dots,n-1)$的充要条件是矩$\boldsymbol{A}$的顺序主子式$\boldsymbol{D}_i \neq 0\ (i=1,2,\dots,k;\ k\leqslant 0)$.
+\end{th4}
+
+该定理可用数学归纳法证明，其中顺序主子式$\boldsymbol{D}_k$的定义：
+\begin{equation}
+    \boldsymbol{D}_k = 
+        \begin{vmatrix}
+            a_{11}^{(1)} & \cdots & a_{1k}^{(1)} \\
+            \  & \ddots & \vdots \\
+            \  & \  & a_{kk}^{(k)}
+        \end{vmatrix}
+        = a_{11}^{(1)}a_{22}^{(2)}\cdots a_{kk}^{(k)}
+\end{equation}
+
+并有如下\textbf{推论}：
+
+若$\boldsymbol{A}$的顺序主子式$\boldsymbol{D}_i \neq 0\ (i=1,2,\dots,n-1)$，则：
+\begin{align*}
+    a_{11}^{(1)} &= \boldsymbol{D}_1 \\[4mm]
+    a_{kk}^{(k)} &= \frac{\boldsymbol{D}_k}{\boldsymbol{D}_{k-1}} \quad (k=2,3,\dots,n)
+\end{align*}
+
+所以，Gauss消元过程完成$\Leftrightarrow\ a_{ii}^{(i)}\neq 0\ \Leftrightarrow D_i\neq 0\quad (i=1,2,\dots,n)$.
+
+
+\newpage
+\section{主元素消元法}
+Gauss消元过程中，要求主元$a_{ii}^{(i)}\neq 0\ (i=1,2,\dots,n)$，当主元相对很小时，以它为除数会导致其他元素数量级的巨大增长，舍入误差就会扩散，导致计算结果严重失真。主元素消元法针对此问题进行改进，全部或部分地选取绝对值最大的元素为主元素，使之成为一种有效（稳定）的算法。
+
+\subsection{全主元素消元法}
+在每一步消元进行前，将系数矩阵中绝对值最大的元素通过交换行、列移动到消元行的首位，再进行消元。如在第一步消元进行前，在整个矩阵$\boldsymbol{A}$中选取绝对值最大的元素作为主元：
+\begin{equation*}
+    \left| a_{i_1,j_1} \right| = \max\limits_{1\leqslant i,j\leqslant n} \left| a_{ij} \right| \neq 0
+\end{equation*}
+将$a_{i_1,j_1}$换到第一行第一列，然后进行消元；第二步消元前将除第一行外的所有元素中绝对值最大的元素交换到第二行第二列位置，再进行消元，重复至$n-1$步得：
+\begin{equation*}
+    \begin{bmatrix}
+        a_{11} & a_{12} & \cdots & a_{1n} \\
+        \      & a_{21} & \cdots & a_{2n} \\
+        \      & \      & \ddots & \vdots \\
+        \      & \      & \      & a_{nn} \\
+    \end{bmatrix}\ 
+    \begin{bmatrix}
+        y_1 \\ y_2 \\ \vdots \\ y_n \\
+    \end{bmatrix} = 
+    \begin{bmatrix}
+        b_1 \\ b_2 \\ \vdots \\ b_n \\
+    \end{bmatrix}
+\end{equation*}
+从而避免了舍入误差。这里的$y_1,y_2,\dots,y_n$为$x_1,x_2,\dots,x_n$的某一个排列，因为进行了列交换。
+
+\subsection{列主元素消元法}
+列主元素消元法只在每一列选取绝对值最大的元素作为主元（只交换行），减小了计算量也能保证同样的效果，并且由于没有列的交换，所以$x_1,x_2,\dots,x_n$的顺序也没有发生变化：
+\begin{equation*}
+    \begin{bmatrix}
+        a_{11} & a_{12} & \cdots & a_{1n} \\
+        \      & a_{21} & \cdots & a_{2n} \\
+        \      & \      & \ddots & \vdots \\
+        \      & \      & \      & a_{nn} \\
+    \end{bmatrix}\ 
+    \begin{bmatrix}
+        x_1 \\ x_2 \\ \vdots \\ x_n \\
+    \end{bmatrix} = 
+    \begin{bmatrix}
+        b_1 \\ b_2 \\ \vdots \\ b_n \\
+    \end{bmatrix}
+\end{equation*}
+
+
+
+\newpage
+\section{矩阵三角解法}
+
+\subsection{Doolittle分解（LU分解）}
+Gauss消元法的过程完成了矩阵$\boldsymbol{A}$的一个三角分解：
+\begin{equation}
+    \boldsymbol{A} = \boldsymbol{LU}
+\end{equation}
+其中$\boldsymbol{L}$为下三角矩阵，$\boldsymbol{U}$为上三角矩阵，若$n$阶矩阵$A$的顺序主子式$D_i \neq 0\ (i=1,2,\dots,n-1)$，则该分解唯一。若$\boldsymbol{A}$非奇异，则$\boldsymbol{U}$也非奇异。其详细过程如下：
+
+消元的第一步等同于将系数矩阵$\boldsymbol{A}$（$\boldsymbol{A}^{(1)}$）和$\boldsymbol{b}$（$\boldsymbol{b}^{(1)}$）左乘一个初等变换矩阵：
+\begin{equation*}
+    \boldsymbol{A}^{(2)} = \boldsymbol{L}_1^{-1} \boldsymbol{A}^{(1)},\quad \boldsymbol{b}^{(2)} = \boldsymbol{L}_1^{-1} \boldsymbol{b}^{(1)},\quad L_1^{-1} = \begin{bmatrix}
+        1 & \  & \ & \ & \  \\
+        -l_{21} & 1 & \ & \ & \  \\
+        -l_{31} & 0 & 1 & \ & \  \\
+        \vdots & \vdots & \vdots & \ddots & \  \\
+        -l_{n1} & 0 & 0 & \cdots & 1 \\
+    \end{bmatrix},\quad l_{i1} = \frac{a_{i1}^{(1)}}{a_{11}^{(1)}}\ (i=2,3,\dots,n)
+\end{equation*}
+
+如此进行$n-1$步后得到：
+\begin{equation*}
+    \begin{cases}
+        \ \boldsymbol{L}_{n-1}^{-1} \boldsymbol{L}_{n-2}^{-1} \cdots \boldsymbol{L}_{2}^{-1} \boldsymbol{L}_{1}^{-1} \boldsymbol{A}^{(1)} = \boldsymbol{A}^{(n)} = \boldsymbol{U} \\
+        \ \boldsymbol{L}_{n-1}^{-1} \boldsymbol{L}_{n-2}^{-1} \cdots \boldsymbol{L}_{2}^{-1} \boldsymbol{L}_{1}^{-1} \boldsymbol{b}^{(1)} = \boldsymbol{b}^{(n)} \\
+    \end{cases}
+\end{equation*}
+
+记$\boldsymbol{L} = \boldsymbol{L}_1 \boldsymbol{L}_2 \dots \boldsymbol{L}_n$，则有$\boldsymbol{LU} = \boldsymbol{A^{(1)}} = \boldsymbol{A}$，具体形式为：
+\begin{equation*}
+    \boldsymbol{L} = \begin{bmatrix}
+        1 & \ & \ & \ & \ \\
+        l_{21} & 1 & \ & \ & \ \\
+        l_{31} & l_{32} & 1 & \ & \ \\
+        \vdots & \vdots & \ & \ddots & \ \\
+        l_{n1} & l_{n2} & \cdots & l_{n,n-1} & 1 \\ 
+    \end{bmatrix},\quad \boldsymbol{U} = 
+    \begin{bmatrix}
+        u_{11} & u_{12} & u_{13} & \cdots & u_{1n} \\
+        \      & u_{22} & u_{23} & \cdots & u_{2n} \\
+        \      & \      & u_{33} & \cdots & u_{3n} \\
+        \      & \      & \      & \ddots & \vdots \\
+        \      & \      & \      & \      & u_{nn} \\
+    \end{bmatrix}
+\end{equation*}
+
+则$\boldsymbol{Ax} = \boldsymbol{LUx} = \boldsymbol{b}$可转化为两个三角形方程求解（行列交替进行）：
+\begin{equation}
+    \begin{cases}
+        \ \boldsymbol{Ly} = \boldsymbol{b} \\
+        \ \boldsymbol{Ux} = \boldsymbol{y} \\
+    \end{cases},\quad
+    \begin{cases}
+        \ y_1 = b_1 \\
+        \ y_i = b_i - \sum\limits_{j=1}\limits^{i-1}l_{ij}y_j
+    \end{cases},\quad
+    \begin{cases}
+        \ x_n = y_n / u_{nn} \\
+        \ x_i = (y_i - \sum\limits_{j=i+1}\limits^{n} u_{ij}x_j)
+    \end{cases}
+\end{equation}
+
+
+\newpage
+\textbf{补充：}$\boldsymbol{LU}$\textbf{分解具有唯一性}$\Leftrightarrow D_i\neq 0\ (i=1,2,\dots,n-1)$
+
+\textbf{Eg.1}
+\begin{equation*}
+    \boldsymbol{A} = \begin{bmatrix}
+        1 & 2 & 3 \\
+        2 & 4 & 4 \\
+        3 & 5 & 6 \\
+    \end{bmatrix}\quad
+    \Rightarrow \boldsymbol{D}_1 = 1,\ \boldsymbol{D}_2 = 0
+\end{equation*}
+
+将$\boldsymbol{A}$消元一次：
+\begin{equation*}
+    \boldsymbol{A}^{(2)} = \begin{bmatrix}
+        1 & 2 & 3 \\
+        0 & 0 & -2 \\
+        0 & -1 & -3 \\
+    \end{bmatrix}
+\end{equation*}
+
+其$\boldsymbol{LU}$分解不存在。
+
+
+\textbf{Eg.2}
+\begin{equation*}
+    \boldsymbol{A} = \begin{bmatrix}
+        1 & 2 & 3 \\
+        2 & 4 & 4 \\
+        3 & 6 & 6 \\
+    \end{bmatrix}\quad
+    \Rightarrow \boldsymbol{D}_1 = 1,\ \boldsymbol{D}_2 = 0
+\end{equation*}
+
+将$\boldsymbol{A}$消元一次：
+\begin{equation*}
+    \boldsymbol{A}^{(2)} = \begin{bmatrix}
+        1 & 2 & 3 \\
+        0 & 0 & -2 \\
+        0 & 0 & -3 \\
+    \end{bmatrix} = \boldsymbol{U}
+\end{equation*}
+
+其$\boldsymbol{LU}$分解存在但不唯一。
+
+
+\textbf{Eg.3}
+\begin{equation*}
+    \boldsymbol{A} = \begin{bmatrix}
+        1 & 2 & 3 \\
+        2 & 3 & 4 \\
+        3 & 4 & 6 \\
+    \end{bmatrix}\quad
+    \Rightarrow \boldsymbol{D}_1 = 1,\ \boldsymbol{D}_2 = -1
+\end{equation*}
+
+将$\boldsymbol{A}$消元：
+\begin{equation*}
+    \boldsymbol{A} \overset{\text{消元1次}}{\longrightarrow} \begin{bmatrix}
+        1 & 2 & 3 \\
+        0 & -1 & -2 \\
+        0 & -2 & -3 \\
+    \end{bmatrix} \overset{\text{消元2次}}{\longrightarrow}
+    \begin{bmatrix}
+        1 & 2 & 3 \\
+        0 & -1 & -2 \\
+        0 & 0 & 1 \\
+    \end{bmatrix} = \boldsymbol{U}
+\end{equation*}
+
+其$\boldsymbol{LU}$分解存在且唯一.
+
+\newpage
+\subsection{列主元素三角分解法}
+为了避免计算出的$u_{ii}$相对较小而放大舍入误差，在计算$u_{ii}$时先寻找绝对值最大的元作为主元再分解计算。
+
+\begin{th4}
+    对非奇异矩阵$\boldsymbol{A}$，存在排列阵$\boldsymbol{P}$，以及元素绝对值不大于1的单位下三角阵$\boldsymbol{L}$和上三角阵$\boldsymbol{U}$，使得：
+    \begin{equation*}
+        \boldsymbol{PA} = \boldsymbol{LU}
+    \end{equation*}
+\end{th4}
+
+\subsection{平方根法}
+\begin{th4}
+    若$n$阶矩阵$\boldsymbol{A}$对称正定，则有唯一分解：
+    \begin{equation}
+        \boldsymbol{A} = \boldsymbol{LDL}^{T}
+    \end{equation}
+    其中，$\boldsymbol{L}$为单位下三角矩阵，$\boldsymbol{D}$为对角阵且对角元素全大于0.
+\end{th4}
+
+\begin{proof}
+    由$\boldsymbol{A}$对称正定可知，$D_i$全大于0，对$\boldsymbol{U}$进行分解，有：
+    \begin{equation*}
+        \boldsymbol{A} = 
+        \begin{bmatrix}
+            1 & \ & \ & \ \\
+            l_{21} & 1 & \ & \ \\
+            \vdots & \vdots & \ddots & \ \\
+            l_{n1} & l_{n2} & \cdots & 1 \\ 
+        \end{bmatrix} \ 
+        \begin{bmatrix}
+            u_{11} & \      & \      & \      \\
+            \      & u_{22} & \      & \      \\
+            \      & \      & \ddots & \      \\
+            \      & \      & \      & u_{nn} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1      & u_{12}/u_{11} & \cdots & u_{1n}/u_{11} \\
+            \      & 1      & \cdots & u_{2n}/u_{22} \\
+            \      & \      & \ddots & \vdots \\
+            \      & \      & \      & 1      \\
+        \end{bmatrix} \equiv \boldsymbol{LDU}_0
+    \end{equation*}
+    由$\boldsymbol{A}=\boldsymbol{A}^T$得：
+    \begin{equation*}
+        \boldsymbol{LDU}_0 = \boldsymbol{U}_0^T \boldsymbol{DL}^T
+    \end{equation*}
+    由于$\boldsymbol{LU}$分解具有唯一性，所以：
+    \begin{equation*}
+        \boldsymbol{U}_0^T = \boldsymbol{L},\quad \boldsymbol{L}^T = \boldsymbol{U}_0
+    \end{equation*}
+    故$\boldsymbol{A}$有唯一分解$\boldsymbol{A}=\boldsymbol{LDL}^T$.
+\end{proof}
+
+    若取$\overline{\boldsymbol{D}}=\mathrm{diag} (\sqrt{u_{11}},\sqrt{u_{22}},\dots,\sqrt{u_{nn}})$，则：
+    \begin{equation*}
+        \boldsymbol{A}=\boldsymbol{L}\overline{\boldsymbol{D}}^2 \boldsymbol{L}^T = (\boldsymbol{L\overline{D}})(\boldsymbol{L\overline{D}})^T \equiv \boldsymbol{GG}^T
+    \end{equation*}
+    
+    其中$\boldsymbol{G}$为下三角矩阵，这种分解称为对称正定矩阵的\textbf{平方根分解（Cholesky分解）}
+
+\begin{th4}
+    若$n$阶矩阵$\boldsymbol{A}$对称正定，则有如下分解：
+    \begin{equation}
+        \boldsymbol{A} = \boldsymbol{GG}^{T}
+    \end{equation}
+    其中$\boldsymbol{G}$为下三角阵。若规定$\boldsymbol{G}$的对角元为正，则该分解唯一。
+\end{th4}
+
+记$\boldsymbol{G}=(g_{ij})_{n \times n}$，则平方根分解算法如下：
+对$k=1,2,\dots,n$，有：
+\begin{equation}
+    \begin{cases}
+        \ a_{kk} \leftarrow g_{kk} = \sqrt{a_{kk} - \sum\limits_{j=1}\limits^{k-1} g^{2}_{kj}} \\[5mm]
+        \ a_{kj} \leftarrow g_{kj} = {\displaystyle \frac{a_{kj} - \sum\limits_{i=1}\limits^{j-1}g_{ki}g_{ji}}{g_{jj}}} \quad (k=j+1,j+2,\dots,n) 
+    \end{cases}
+\end{equation}
+
+\begin{th4}
+    若线性代数方程组$\boldsymbol{Ax} = \boldsymbol{b}$的系数矩阵$\boldsymbol{A}$对称正定，则用平方根法进行求解是稳定的。
+\end{th4}
+
+
+\subsection{三对角方程组的追赶法}
+在建立三次样条插值函数、求微分方程数值解等问题中，常遇到三对角方程组$\boldsymbol{Ax} = \boldsymbol{g}$：
+\begin{equation}
+    \begin{bmatrix}
+        b_1 & c_1       & \       & \      & \       \\
+        a_2 & b_2       & c_2     & \      & \       \\
+        \   & \ddots    & \ddots  & \ddots & \       \\
+        \   & \         & a_{n-1} & b_{n-1}& c_{n-1} \\
+        \   & \         & \       & a_{n}  & b_{n}   \\
+    \end{bmatrix}\ 
+    \begin{bmatrix}
+        x_1 \\ x_2 \\ \vdots \\ x_{n-1} \\ x_n \\
+    \end{bmatrix} = 
+    \begin{bmatrix}
+        g_1 \\ g_2 \\ \vdots \\ g_{n-1} \\ g_n \\
+    \end{bmatrix}
+\end{equation}
+
+系数矩阵$\boldsymbol{A}$\textbf{严格对角占优}，即满足每一行的主元的绝对值大于该行其他元素绝对值之和：
+\begin{equation}
+    \begin{cases}
+        \ \left| b_1 \right| > \left| c_1 \right| \\
+        \ \left| b_i \right| > \left| a_i \right| + \left| c_i \right| \\
+        \ \left| b_n \right| > \left| a_n \right|  \\
+    \end{cases}\quad (i=1,2,\dots,n-1)
+\end{equation}
+则$\boldsymbol{A}$非奇异，方程组$\boldsymbol{Ax}=\boldsymbol{g}$存在唯一解。
+
+利用$\boldsymbol{LU}$分解：
+\begin{equation*}
+    \begin{bmatrix}
+        b_1 & c_1       & \       & \      & \       \\
+        a_2 & b_2       & c_2     & \      & \       \\
+        \   & \ddots    & \ddots  & \ddots & \       \\
+        \   & \         & a_{n-1} & b_{n-1}& c_{n-1} \\
+        \   & \         & \       & a_{n}  & b_{n}   \\
+    \end{bmatrix} = 
+    \begin{bmatrix}
+        1 & \ & \ & \ \\
+        l_2 & 1 & \ & \ \\
+        \ & \ddots & \ddots &\ \\
+        \ & \ & l_n & 1 \\
+    \end{bmatrix}\ 
+    \begin{bmatrix}
+        u_1 & d_1 & \   & \  &\  \\
+        \   & u_2 & d_2 & \  &\  \\
+        \   & \   & \ddots & \ddots & \ \\
+        \   & \   & \   & \ddots & d_{n-1} \\
+        \   & \   & \   & \  & u_n \\
+    \end{bmatrix}
+\end{equation*}
+
+根据矩阵乘法记矩阵相等可得分解的计算公式：
+\begin{equation}\label{thomas1}
+    \begin{cases}
+        \ d_i = c_i \quad (i=1,2,\dots,n-1) \\
+        \ u_1 = b_1 \\
+        \ l_i = a_i / u_{i-1},\ u_i = b_i - l_i d_{i-1} \quad (i=2,3,\dots,n)
+    \end{cases}
+\end{equation}
+
+从而原将方程组$\boldsymbol{Ax}=\boldsymbol{g}$转化为求解方程组$\boldsymbol{Ly}=\boldsymbol{g}$和$\boldsymbol{Ux}=\boldsymbol{y}$，即：
+\begin{align}
+    & \begin{cases}
+        \ y_1 = g_1 \\
+        \ y_i = g_i - l_i y_{i-1} \quad (i=2,3,\dots,n)
+    \end{cases} \label{thomas2}\\
+    & \begin{cases}
+        \ x_n = {\displaystyle \frac{y_n}{u_n}} \\[3mm]
+        \ x_i = {\displaystyle \frac{y_i - c_i x_{i+1}}{u_i}} \quad (i=n-1,\dots,1)
+    \end{cases} \label{thomas3}
+\end{align}
+
+求解式(\ref{thomas1})、式(\ref{thomas2})和式(\ref{thomas3})的方法称为\textbf{追赶法（Thomas方法）}。
+
+
+\newpage
+\section{向量范数、矩阵范数、条件数}
+范数是为了度量向量和矩阵的尺度，例如在一维上用绝对值$\left|x-x_0\right|$的大小度量$x \rightarrow x_0$，是欧氏空间中向量长度的推广，为下一章研究$\boldsymbol{Ax}=\boldsymbol{b}$的解对$\boldsymbol{A}$和$\boldsymbol{b}$的敏感性以及迭代法求解的收敛性和迭代解的误差估计等问题。
+
+\subsection{向量范数、矩阵范数、谱半径}
+\begin{enumerate}
+    \item \textbf{Def：}对任一向量$\boldsymbol{x}=(x_1,x_2,\dots,x_n)^T \in \mathbf{R}$，对应一个实值函数$N(\boldsymbol{x})=\Vert \boldsymbol{x} \Vert$，若满足下列性质：
+    \begin{enumerate}
+        \item $\Vert \boldsymbol{x} \Vert \geqslant 0,\ \Vert \boldsymbol{x} \Vert = 0 \Leftrightarrow \boldsymbol{x}=\boldsymbol{0} \in \mathbf{R}^n$（正定性）
+        \item $\forall \alpha \in \mathbf{R},\ \Vert \alpha \boldsymbol{x} \Vert = \vert \alpha \vert \Vert \boldsymbol{x} \Vert$（齐次性）
+        \item $\forall \boldsymbol{y} = (y_1,y_2,\dots,y_n)^T \in \mathbf{R}^n,\ \Vert \boldsymbol{x}+\boldsymbol{y} \Vert \leqslant \Vert \boldsymbol{x} \Vert + \Vert \boldsymbol{y} \Vert$（三角不等式）
+    \end{enumerate}
+    则称$N(\boldsymbol{x})=\Vert \boldsymbol{x} \Vert$为\textbf{向量$\boldsymbol{x}$的范数}.
+    
+    $\mathbf{R}^n$中常见的几种范数有：
+    \begin{align}
+        \Vert \boldsymbol{x} \Vert_1 \ &= \sum\limits_{i=1}\limits^{n} \vert x_i \vert \quad \text{\small (1-范数)}\\[3mm]
+        \Vert \boldsymbol{x} \Vert_2 \ &= (\sum\limits_{i=1}\limits^{n} x_i^2)^{\frac{1}{2}} \quad \text{\small (2-范数)}\\[3mm]
+        \Vert \boldsymbol{x} \Vert_\infty &= \max\limits_{1\leqslant i\leqslant n} \{\vert x_i \vert\} \quad \text{\small ($\infty$-范数)}
+    \end{align}
+
+    向量范数的等价性：设$\Vert \cdot \Vert_s,\ \Vert \cdot \Vert_t$为$\mathbf{R}^n$上向量$\boldsymbol{x}$的任意两种范数，则存在与$\boldsymbol{x}$无关的常数$m,M>0$使得:
+    \begin{equation}
+        m\Vert \boldsymbol{x}\Vert_s \leqslant \Vert \boldsymbol{x}\Vert_t \leqslant M\Vert \boldsymbol{x} \Vert_s, \quad \forall \boldsymbol{x} \in \mathbf{R}^n.
+    \end{equation}
+
+    \textbf{def：}设$\{ \boldsymbol{x}^{(k)} \}$为$\mathbf{R}^n$中一向量序列，$\boldsymbol{x}^{*} \in \mathbf{R}^n$，若：
+    \begin{equation*}
+        \lim_{k\rightarrow \infty} x_j^{(k)} = x_j^{*}\quad (j=1,2,\dots,n)
+    \end{equation*}
+    则称向量序列$\{ \boldsymbol{x}^{(k)} \}$收敛于$\boldsymbol{x}^*$，并有如下\textbf{th}成立：
+    \begin{equation*}
+        \lim_{k\rightarrow \infty} \boldsymbol{x}^{(k)} = \boldsymbol{x}^\ast \Leftrightarrow \lim_{k\rightarrow \infty} \Vert \boldsymbol{x}^{(k)} - \boldsymbol{x}^\ast \Vert = 0
+    \end{equation*}
+
+
+    \newpage
+    \item \textbf{Def：}若矩阵$\boldsymbol{A} \in \mathbf{R}^{n\times n}$的非负实值函数$N(\boldsymbol{A}) = \Vert \boldsymbol{A} \Vert$满足以下条件：
+    \begin{enumerate}
+        \item $\Vert \boldsymbol{A} \Vert \geqslant 0,\ \Vert \boldsymbol{A} \Vert = 0 \Leftrightarrow \boldsymbol{A}=\boldsymbol{0} \in \mathbf{R}^{n\times n}$（正定性）
+        \item $\forall \alpha \in \mathbf{R},\ \Vert \alpha \boldsymbol{A} \Vert = \vert \alpha \vert \Vert \boldsymbol{A} \Vert$（齐次性）
+        \item $\forall\ \boldsymbol{A}, \boldsymbol{B} \in \mathbf{R}^{n \times n},\ \Vert \boldsymbol{A}+\boldsymbol{B} \Vert \leqslant \Vert \boldsymbol{A} \Vert + \Vert \boldsymbol{B} \Vert$（三角不等式）
+        \item $\forall\ \boldsymbol{A}, \boldsymbol{B} \in \mathbf{R}^{n \times n},\ \Vert \boldsymbol{AB} \Vert \leqslant \Vert \boldsymbol{A} \Vert \ \Vert \boldsymbol{B} \Vert$
+    \end{enumerate}
+    则称$N(\boldsymbol{A}) = \Vert \boldsymbol{A} \Vert$为\textbf{矩阵$\boldsymbol{A}$的范数}.
+
+    $\mathbf{R}^{n \times n}$中常见的几种范数有：
+    \begin{align}
+        \Vert \boldsymbol{A} \Vert_1 \ &= \max_{1 \leqslant j \leqslant n} \sum\limits_{i=1}\limits^{n} \vert a_{ij} \vert \quad \text{\small ($\boldsymbol{A}$的列范数)}\\[3mm]
+        \Vert \boldsymbol{A} \Vert_\infty &= \max_{1 \leqslant i \leqslant n} \sum\limits_{j=1}\limits^{n} \vert a_{ij} \vert \quad \text{\small ($\boldsymbol{A}$的行范数)}\\[3mm]
+        \Vert \boldsymbol{A} \Vert_2 \ &= \sqrt{\lambda_{\max}(\boldsymbol{A}^T\boldsymbol{A})} \quad \text{\small ($\boldsymbol{A}$的谱范数)}\\[4mm]
+        \Vert \boldsymbol{A} \Vert_\mathrm{F} \ &= (\sum\limits_{i,j=1}\limits^{n}a_{ij}^{2})^{\frac{1}{2}} \quad \text{\small ($\boldsymbol{A}$的F范数)}
+    \end{align}
+    其中$\boldsymbol{A}=(a_{ij})_{n \times n},\ \lambda_{\max}(\boldsymbol{A}^T\boldsymbol{A})$为$\boldsymbol{A}^T\boldsymbol{A}$的最大特征值。
+
+    向量和矩阵范数的相容性：
+    \begin{equation*}
+        \Vert \boldsymbol{Ax} \Vert_s \leqslant \Vert \boldsymbol{A} \Vert \ \Vert \boldsymbol{x} \Vert_s \quad \forall \boldsymbol{A} \in \mathbf{R}^{n \times n}, x \in \mathbf{R}^n
+    \end{equation*}
+
+    \textbf{def：}设$\{ \boldsymbol{A}^{(k)} \}$为$\mathbf{R}^{n\times n}$中的矩阵序列，$\boldsymbol{A} \in \mathbf{R}^{n\times n}$，若：
+    \begin{equation*}
+        \lim_{k\rightarrow \infty} a_{ij}^{(k)} = a_{ij} \quad (i,j=1,2,\dots,n)
+    \end{equation*}
+    则称向量序列$\{ \boldsymbol{A}^{(k)} \}$收敛于$\boldsymbol{A}$，并有如下\textbf{th}成立：
+    \begin{equation*}
+        \lim_{k\rightarrow \infty} \boldsymbol{A}^{(k)} = \boldsymbol{A} \Leftrightarrow \lim_{k\rightarrow \infty} \Vert \boldsymbol{A}^{(k)} - \boldsymbol{A} \Vert = 0
+    \end{equation*}
+
+
+    \newpage
+    \item \textbf{Def：}设$\boldsymbol{A} \in \mathbf{R}^{n\times n}$的特征值为$\lambda_i\ (i=1,2,\dots,n)$，定义矩阵$\boldsymbol{A}$的\textbf{谱半径}为：
+    \begin{equation*}
+        S(\boldsymbol{A}) = \max_{1\leqslant i \leqslant n}\{\vert\lambda_i\vert\}
+    \end{equation*}
+    根据特征值$\boldsymbol{Ax}=\lambda\boldsymbol{x}$知$\vert \lambda \vert \ \Vert \boldsymbol{x}\Vert = \Vert\boldsymbol{Ax}\Vert \leqslant \Vert\boldsymbol{A}\Vert \ \Vert\boldsymbol{x}\Vert$，且$\boldsymbol{x} \neq 0$，所以：
+    \begin{equation*}
+        S(\boldsymbol{A}) \leqslant \Vert\boldsymbol{A}\Vert
+    \end{equation*}
+
+    \textbf{Th：}设任意$n$阶矩阵$\boldsymbol{F}$满足$\Vert\boldsymbol{F}\Vert < 1$，则$\boldsymbol{I}\pm\boldsymbol{F}$非奇异（$\boldsymbol{I}$为单位矩阵），且：
+    \begin{equation*}
+        \Vert(\boldsymbol{I}\pm\boldsymbol{F})\Vert \leqslant \frac{1}{1-\Vert\boldsymbol{F}\Vert}
+    \end{equation*}
+
+    \textbf{Th：}设$\boldsymbol{A}\in\mathbf{R}^{n\times n}$，由$\Vert\boldsymbol{A}\Vert$的各次幂所组成的矩阵序列：
+    \begin{equation*}
+         \boldsymbol{A}^0,\boldsymbol{A},\boldsymbol{A}^2,\cdots,\boldsymbol{A}^k,\cdots
+    \end{equation*}
+    其中$\boldsymbol{A}^0 = \boldsymbol{I}$，该序列收敛于零矩阵（即$\lim\limits_{k\rightarrow\infty}\boldsymbol{A}^k = 0$）的充要条件为：
+    \begin{equation*}
+        S(\boldsymbol{A}) < 1
+    \end{equation*}
+\end{enumerate}
+
+\subsection{矩阵条件数及方程组性态*}
+略
+
+% \end{document}

@@ -1,0 +1,283 @@
+% \documentclass[a4paper, 11pt, oneside, onecolumn, titlepage]{ctexrep}
+
+% \usepackage{makeidx,amsmath}
+% \usepackage{unicode-math}
+% \usepackage{setspace}
+% \usepackage{amsthm}
+% \usepackage{geometry}
+% \usepackage{fancyhdr}
+% \usepackage{mathrsfs} 
+% \usepackage{tikz}
+
+% \geometry{left=25mm,right=25mm,top=30mm,bottom=30mm}
+% \setmathfont{XITS Math}
+
+% \linespread{1.5}
+% \title{Numerical Integration \& Numerical Differentiation}
+% \author{Brassicaaa}
+% \date{\today}
+
+% \setlength{\headheight}{27pt}
+
+% \begin{document}
+% \pagestyle{fancy}
+% \lhead{Notes for Numerical Analysis}
+% \setcounter{page}{1}
+% \pagenumbering{arabic}
+
+\chapter{解线性方程组-迭代法}
+迭代法的基本思想是对方程组$\boldsymbol{Ax}=\boldsymbol{b}$，构造一个迭代向量序列$\{\boldsymbol{x}^{(k)}\}$，使其收敛于方程组的解向量$\boldsymbol{x}^\ast$，然后分析其收敛性和误差。本章节均为\textbf{单点线性迭代}，形式为：
+\begin{align}
+    \boldsymbol{x}^{(k+1)} = \boldsymbol{Mx}^{(k)} + \boldsymbol{f}
+\end{align}
+
+
+\section{Jacobi迭代法}
+\subsection{迭代构造}
+Jacobi迭代法又称简单迭代法，将原方程组$\boldsymbol{Ax}=\boldsymbol{b}$改写成等价形式（假定$\boldsymbol{A}$非奇异）：
+\begin{align}
+    \begin{cases}
+        \ x_1 = \qquad \quad b_{12}x_2 + b_{13}x_3 + \cdots + b_{1n}x_n + g_1 \\
+        \ x_2 = b_{21}x_1 \qquad \quad + b_{23}x_3 + \cdots + b_{2n}x_n + g_2 \\
+        \ \cdots \cdots \cdots \\
+        \ x_n = b_{n1}x_1  + b_{n2}x_2 + \cdots + b_{nn-1}x_{n-1} \quad \  + g_n \\
+    \end{cases} \Rightarrow \boldsymbol{x} = \boldsymbol{Bx} + \boldsymbol{g}
+\end{align}
+其中：
+\begin{align*}
+    \boldsymbol{B}=\boldsymbol{I}-\boldsymbol{D}^{-1}\boldsymbol{A}=\begin{bmatrix}
+        0      & b_{12} & b_{13}  & \cdots & b_{1n} \\
+        b_{21} & 0      & b_{23}  & \cdots & b_{2n} \\
+        \vdots & \vdots & \vdots  & \      & \vdots \\
+        b_{n1} & b_{n2} & b_{n3}  & \cdots & 0      \\
+    \end{bmatrix}, \quad
+    \boldsymbol{I} = \boldsymbol{D}^{-1}\boldsymbol{b}=\begin{bmatrix}
+        g_1 \\ g_2 \\ \cdots \\ g_n \\
+    \end{bmatrix}, \quad
+    \boldsymbol{D} = \begin{bmatrix}
+        a_{11} & \      & \      & \      \\
+        \      & a_{22} & \      & \      \\
+        \      &        & \ddots & \      \\
+        \      & \      & \      & a_{nn} \\
+    \end{bmatrix}
+\end{align*}
+
+对任一初始迭代向量$\boldsymbol{x}^{(0)}$，由公式：
+\begin{align}
+    \boldsymbol{x}^{(k+1)} = \boldsymbol{Bx}^{(k)} + \boldsymbol{g} \quad (k=1,2,\cdots)
+\end{align}
+由此作出向量序列$\boldsymbol{x}^{(1)},\boldsymbol{x}^{(2)},\cdots$的方法称为\textbf{Jacobi迭代法}，$\boldsymbol{B}$称为Jacobi矩阵。
+
+
+\subsection{收敛性}
+设$\boldsymbol{x}^\ast$为该方程准确解，收敛性$\lim\limits_{k\rightarrow\infty}\boldsymbol{x}^{(k)}=\boldsymbol{x}^{\ast}$的判断条件为：
+\begin{enumerate}
+    \item $S(\boldsymbol{B})<1\ \Leftrightarrow \ $Jacobi迭代法收敛
+    \item $\ \Vert\boldsymbol{B}\Vert < 1 \ \Rightarrow \ $Jacobi迭代法收敛，$\Vert\boldsymbol{B}\Vert$为$\boldsymbol{B}$任意范数，此时有：
+        \begin{enumerate}
+            \item \begin{align}
+                \Vert\boldsymbol{x}^{(k)} - \boldsymbol{x}^\ast\Vert \leqslant \frac{\Vert\boldsymbol{B}\Vert^k}{1-\Vert\boldsymbol{B}\Vert} \Vert\boldsymbol{x}^{(1)} - \boldsymbol{x}^{(0)}\Vert
+            \end{align}
+            \item 此处亦为误差的事后估计：\begin{align}
+                \Vert\boldsymbol{x}^{(k)} - \boldsymbol{x}^\ast\Vert \leqslant \frac{\Vert\boldsymbol{B}\Vert}{1-\Vert\boldsymbol{B}\Vert} \Vert\boldsymbol{x}^{(k)} - \boldsymbol{x}^{(k-1)}\Vert
+            \end{align}
+        \end{enumerate}
+\end{enumerate}
+
+\begin{proof}
+    上述二个收敛条件的证明如下：
+    \begin{enumerate}
+        \item 收敛条件1：
+            \begin{enumerate}
+                \item "$\Rightarrow$":
+                    假定$S(\boldsymbol{B})<1$，根据范数的定理知$\boldsymbol{I}-\boldsymbol{B}$非奇异，则方程组$\boldsymbol{x}=\boldsymbol{Bx}+\boldsymbol{g}$有唯一解$\boldsymbol{x}^\ast$，又因为：
+                    \begin{align*}
+                        \begin{cases}
+                            \ \boldsymbol{x}^{\ast}=\boldsymbol{Bx}^\ast+\boldsymbol{g} \\
+                            \ \boldsymbol{x}^{(k)} = \boldsymbol{Bx}^{(k-1)} + \boldsymbol{g} \\
+                        \end{cases} \Rightarrow \boldsymbol{x}^{(k)} - \boldsymbol{x}^{\ast} = \boldsymbol{B}(\boldsymbol{x}^{(k-1)} - \boldsymbol{x}^{\ast})
+                    \end{align*}
+                    从而：
+                    \begin{align*}
+                        & \boldsymbol{x}^{(k)} - \boldsymbol{x}^{\ast} = \boldsymbol{B}^k (\boldsymbol{x}^{(0)} - \boldsymbol{x}^{\ast}) \\[3mm]
+                        \because \  & S(\boldsymbol{B}) < 1 \quad \therefore \ \lim_{k\rightarrow\infty}\boldsymbol{B}^k = \boldsymbol{0} \\[3mm]
+                        \therefore \ & \lim_{k\rightarrow\infty}\boldsymbol{x}^{(k)} = \boldsymbol{x}^\ast
+                    \end{align*}
+                \item "$\Leftarrow$":
+                    由Jacobi迭代法收敛可知：
+                    \begin{align*}
+                        & \lim_{k\rightarrow\infty}\boldsymbol{x}^{(k)} = \boldsymbol{x}^\ast \quad \therefore \ \lim_{k\rightarrow\infty}(\boldsymbol{x}^{(k)}-\boldsymbol{x}^\ast) = \boldsymbol{B}^k (\boldsymbol{x}^{(0)} - \boldsymbol{x}^{\ast}) = \boldsymbol{0} \\[3mm]
+                        \because \ & \boldsymbol{x}^{(0)} \neq \boldsymbol{x}^\ast \quad \therefore \ \lim_{k\rightarrow\infty}\boldsymbol{B}^k = \boldsymbol{0} \quad \Rightarrow \ \lambda_i = 0 \quad \Rightarrow \ S(\boldsymbol{B}) < 1
+                    \end{align*}
+            \end{enumerate}
+        \item 收敛条件2：因为$\Vert\boldsymbol{B}\Vert<1$，所以$S(\boldsymbol{B}) \leqslant \Vert\boldsymbol{B}\Vert < 1$，所以Jacobi迭代法收敛。
+            因为$\lim\limits_{k\rightarrow\infty}\boldsymbol{x}^{(k)}=\boldsymbol{x}^{\ast}$，从而：
+            \begin{align*}
+                \boldsymbol{x}^{(k)}-\boldsymbol{x}^{\ast} &= \sum\limits_{j=k}\limits^{\infty} (\boldsymbol{x}^{(j)}-\boldsymbol{x}^{(j+1)}) \\[3mm]
+                \Rightarrow \ \Vert \boldsymbol{x}^{(k)}-\boldsymbol{x}^{\ast} \Vert &\leqslant \sum\limits_{j=k}\limits^{\infty}\Vert \boldsymbol{x}^{(j)}-\boldsymbol{x}^{(j+1)} \Vert = \sum\limits_{j=k}\limits^{\infty}\Vert \boldsymbol{x}^{(j+1)}-\boldsymbol{x}^{(j)} \Vert \\[3mm]
+                &\leqslant (\sum\limits_{j=k}\limits^{\infty} \Vert\boldsymbol{B}\Vert^{j})\ \Vert\boldsymbol{x}^{(1)}-\boldsymbol{x}^{(0)}\Vert \\[3mm]
+                &= \frac{\Vert\boldsymbol{B}\Vert^{k}}{1-\Vert\boldsymbol{B}\Vert}\ \Vert\boldsymbol{x}^{(1)}-\boldsymbol{x}^{(0)}\Vert \quad \text{\small 等比数列求和}
+            \end{align*}
+            又因为$\boldsymbol{x}^\ast = \boldsymbol{Bx}^{\ast}+\boldsymbol{g},\ \boldsymbol{x}^{(k)} = \boldsymbol{Bx}^{(k-1)}+\boldsymbol{g}$，所以：
+            \begin{align*}
+                & \boldsymbol{x}^{(k)} = \boldsymbol{Bx}^{(k-1)}+(\boldsymbol{I}-\boldsymbol{B})\boldsymbol{x}^\ast \\[3mm]
+                \Rightarrow \ &(\boldsymbol{I}-\boldsymbol{B})(\boldsymbol{x}^{(k)}-\boldsymbol{x}^\ast) = \boldsymbol{B} (\boldsymbol{x}^{(k-1)}-\boldsymbol{x}^{(k)}) \\[3mm]
+                \Rightarrow \ &\boldsymbol{x}^{(k)}-\boldsymbol{x}^\ast = (\boldsymbol{I}-\boldsymbol{B})^{-1} \boldsymbol{B} (\boldsymbol{x}^{(k-1)}-\boldsymbol{x}^{(k)}) \\[3mm]
+                \Rightarrow \ & \Vert\boldsymbol{x}^{(k)}-\boldsymbol{x}^\ast\Vert \leqslant \frac{\Vert\boldsymbol{B}\Vert}{1-\Vert\boldsymbol{B}\Vert}\ \Vert\boldsymbol{x}^{(k)}-\boldsymbol{x}^{(k-1)}\Vert
+            \end{align*}
+    \end{enumerate}
+\end{proof}
+
+
+\section{Gauss-Seidel迭代法}
+\subsection{迭代构造}
+在Jacobi迭代时，需要保留两个向量$\boldsymbol{x}^{(k+1)}$和$\boldsymbol{x}^{(k)}$，迭代的形式为：
+\begin{align}
+    \begin{cases}
+        \ x_1^{(k+1)} = \qquad \quad b_{12}x_2^{(k)} + b_{13}x_3^{(k)} + \cdots + b_{1n}x_n^{(k)} + g_1 \\
+        \ x_2^{(k+1)} = b_{21}x_1^{(k)} \qquad \quad + b_{23}x_3^{(k)} + \cdots + b_{2n}x_n^{(k)} + g_2 \\
+        \ \cdots \cdots \cdots \\
+        \ x_n^{(k+1)} = b_{n1}x_1^{(k)}  + b_{n2}x_2^{(k)} + \cdots + b_{nn-1}x_{n-1}^{(k)} \quad \ \  + g_n \\
+    \end{cases} \Rightarrow \boldsymbol{x}^{(k+1)} = \boldsymbol{Bx}^{(k)} + \boldsymbol{g}
+\end{align}
+
+在迭代到一定步数i后，$x_1^{(k+1)},x_2^{(k+1)},\dots,x_{i-1}^{(k+1)}$要比$x_1^{(k)},x_2^{(k)},\dots,x_{i-1}^{(k)}$精度更高，因此进行替换，迭代形式为：
+\begin{align}
+    \begin{cases}
+        \ x_1^{(k+1)} = \qquad \quad b_{12}x_2^{(k)} + b_{13}x_3^{(k)} + \cdots + b_{1n}x_n^{(k)} + g_1 \\
+        \ x_2^{(k+1)} = b_{21}x_1^{(k+1)} \qquad \quad + b_{23}x_3^{(k)} + \cdots + b_{2n}x_n^{(k)} + g_2 \\
+        \ \cdots \cdots \cdots \\
+        \ x_n^{(k+1)} = b_{n1}x_1^{(k+1)}  + b_{n2}x_2^{(k+1)} + \cdots + b_{nn-1}x_{n-1}^{(k+1)} \quad \ \  + g_n \\
+    \end{cases} \Rightarrow \boldsymbol{x}^{(k+1)} = \boldsymbol{Lx}^{(k+1)} + \boldsymbol{Ux}^{(k)} + \boldsymbol{g}
+\end{align}
+此即为\textbf{Gauss-Seidel迭代法}，其中，$\boldsymbol{L}$为下三角矩阵，$\boldsymbol{U}$为上三角矩阵:
+\begin{align*}
+    \boldsymbol{L}=\begin{bmatrix}
+        0      & 0       & \cdots   & 0      \\
+        b_{21} & 0       & \cdots   & 0      \\
+        \vdots & \ddots  & \        & \vdots \\
+        b_{n1} & \cdots  & b_{nn-1} & 0      \\
+    \end{bmatrix},\quad 
+    \boldsymbol{U}=\begin{bmatrix}
+        0      & b_{13}  & \cdots & b_{1n}   \\
+        0      & 0       & \ddots & \vdots   \\
+        \vdots & \vdots  & \      & b_{n-1n} \\
+        0      & 0       & \cdots & 0        \\
+    \end{bmatrix}
+\end{align*}
+
+可将其改写成单点线性迭代形式：
+\begin{align}
+    \boldsymbol{x}^{(k+1)} = (\boldsymbol{I}-\boldsymbol{L})^{-1}\boldsymbol{Ux}^{(k)} + (\boldsymbol{I}-\boldsymbol{L})^{-1}\boldsymbol{g}
+\end{align}
+
+\subsection{收敛性}
+Gauss-Seidel方法收敛性的判断条件为：
+\begin{enumerate}
+    \item $S((\boldsymbol{I}-\boldsymbol{L})^{-1}\boldsymbol{U})<1\ \Leftrightarrow \ $Gauss-Seildel迭代法收敛
+    \item $\ \Vert\boldsymbol{B}\Vert_1 < 1 \ \Rightarrow \ $Gauss-Seidel迭代法收敛
+    \item $\ \Vert\boldsymbol{B}\Vert_\infty < 1 \ \Rightarrow \ $Gauss-Seidel迭代法收敛，此时记：
+        \[
+            \mu = \frac{\max_i(\sum\limits_{j=i}\limits^{n}\vert b_{ij}\vert)} {1-\sum\limits_{j=1}\limits^{i-1}\vert b_{ij}\vert}
+        \]
+        则有：
+        \begin{align}
+            \mu &\leqslant \Vert\boldsymbol{B}\Vert_{\infty} < 1 \\[3mm]
+            \Vert\boldsymbol{x}^{(k)}-\boldsymbol{x}^{\ast}\Vert &\leqslant \frac{\mu^{k}}{1-\mu} \Vert\boldsymbol{x}^{(1)}-\boldsymbol{x}^{(0)}\Vert 
+        \end{align}
+\end{enumerate}
+
+
+\section{超松弛迭代法}
+\subsection{迭代构造}
+超松弛迭代法（Successive Over Relaxation）类似Richardson加速外推，是对Gauss-Seidel迭代法的一种加速方法，是解大型稀疏矩阵的有效方法之一，其构造的形式如下：
+\[\begin{cases}
+    \ \widetilde{x}_i^{(k+1)} = \sum\limits_{j=1}\limits^{i-1} b_{ij} x_j^{(k+1)} + \sum\limits_{j=i+1}\limits^{n}b_{ij} x_j^{(k)} + g_i \\
+    \ x_i^{(k+1)} = x_i^{(k)} + \omega(\widetilde{x}_i^{(k+1)} - x_i^{(k)}) \\
+\end{cases} \quad (i=1,2,\dots,n\quad \omega \in \mathbf{R})\]
+
+% \[\left\{\begin{align}
+%     \ \widetilde{x}_i^{(k+1)} &= \sum\limits_{j=1}\limits^{i-1} b_{ij} x_j^{(k+1)} + \sum\limits_{j=i+1}\limits^{n} + g_i \\
+%     \ x_i^{(k+1)} &= x_i^{(k)} + \omega(\widetilde{x}_i^{(k+1)} - x_i^{(k)}) \\
+% \end{align}\right.\]
+其中$\omega$称为\textbf{超松弛因子}，当$\omega=1$时即为Gauss-Seidel迭代，消去中间量$\widetilde{x}_i^{(k+1)}$得：
+\[
+    x_i^{(k+1)} = (1-\omega)\,x_i^{(k)} + \omega\,(\sum\limits_{j=1}\limits^{i-1} b_{ij} x_j^{(k+1)} + \sum\limits_{j=i+1}\limits^{n}b_{ij} x_j^{(k)} + g_i)
+\]
+
+SOR迭代方法的向量形式迭代公式为：
+\[
+    \boldsymbol{x}^{(k+1)} = (1-\omega)\,\boldsymbol{x}^{(k)} + \omega\,(\boldsymbol{Lx}^{(k+1)}+\boldsymbol{Ux}^{(k)}+\boldsymbol{g}) 
+\]
+
+SOR迭代方法的单点线性迭代形式为：
+\begin{align}
+    \boldsymbol{x}^{(k+1)} &= (\boldsymbol{I}-\omega\boldsymbol{L})^{-1} [(1-\omega)\boldsymbol{I}+\omega\boldsymbol{U}]\boldsymbol{x}^{(k)} + \omega(\boldsymbol{I}-\omega\boldsymbol{L})^{-1}\boldsymbol{g} \notag \\[3mm]
+    &\triangleq \mathscr{L}_\omega \boldsymbol{x}^{(k)} + \omega(\boldsymbol{I}-\omega\boldsymbol{L})^{-1}\boldsymbol{g}
+\end{align}
+
+
+\subsection{收敛性}
+\begin{enumerate}
+    \item $ S(\mathscr{L}_\omega) < 1 \Leftrightarrow \ $SOR迭代方法收敛
+\end{enumerate}
+
+\newpage
+\newtheorem{th5}{Theorem}[section]
+\begin{th5}
+    对$\forall \omega \in \mathbf{C}$:
+    \[S(\mathscr{L}_\omega) \geqslant \vert\omega-1\vert\]
+    当$\omega \in \mathbf{R}$，并且SOR方法收敛时，有：
+    \[0<\omega<2\]
+\end{th5}
+
+
+\section*{J方法、GS方法和SOR方法收敛的矩阵A补充条件}
+
+\textbf{Definations:}
+\begin{enumerate}
+    \item 设矩阵$\boldsymbol{A}$为$n$阶方阵($n\geqslant 2$)，若存在$n$阶排列阵$\boldsymbol{P}$，使得：
+        \[\boldsymbol{PAP}^T = \begin{bmatrix}
+            \boldsymbol{A}_{11} & \boldsymbol{A}_{12} \\
+            0 & \boldsymbol{A}_{13}\\
+        \end{bmatrix} \]
+        成立，其中$\boldsymbol{A}_{11}$为$r$阶方阵，$\boldsymbol{A}_{22}$为$n-r$阶方阵，则称$\boldsymbol{A}$为\textbf{可约矩阵}；若不存在排列阵$\boldsymbol{P}$，则称$\boldsymbol{A}$为\textbf{不可约矩阵}。
+        矩阵$\boldsymbol{A}$不可约的\textbf{充分条件}：
+        \begin{enumerate}
+            \item 矩阵$\boldsymbol{A}$中没有$0$元；
+            \item 矩阵$\boldsymbol{B}$不可约，矩阵$\boldsymbol{A}$中$0$元位置与$\boldsymbol{B}$相同；
+            \item 矩阵$\boldsymbol{A}$的阶数$n\geqslant 3$，且只有1个0元；
+            \item 矩阵$\boldsymbol{A}$是三对角阵，且三对角元都$\neq 0$.
+        \end{enumerate}
+        
+    \item 设矩阵$\boldsymbol{A}=(a_{ij})_{n\times n}\in\mathbf{R}^{n\times n}$(或$\mathbf{C}^{n\times n}$)，若满足：
+        \[ \vert a_{ii}\vert \geqslant \sum\limits_{\substack{j=1\\j\neq i}}\limits^{n}\left| a_{ij} \right|\quad (i=1,2,\dots,n) \]
+        \begin{enumerate}
+            \item 若满足上式，则称$\boldsymbol{A}$为\textbf{对角占优矩阵}；
+            \item 若上式对所有$i\,(i=1,2,\dots,n)$都有严格不等号成立，则称$\boldsymbol{A}$为\textbf{严格对角占优矩阵}；
+            \item 若$\boldsymbol{A}$不可约且对角占优，并且至少有一个$i\,(i=1,2,\dots,n)$使得上式的不等号严格成立，则称$\boldsymbol{A}$为\textbf{不可约对角占优矩阵}.
+        \end{enumerate}
+        \begin{th5}
+            若$\boldsymbol{A}$为严格对角占优或不可约对角占优矩阵，则$\boldsymbol{A}$非奇异.
+        \end{th5}
+        \begin{th5}
+            若$\boldsymbol{A}$为严格对角占优或不可约对角占优矩阵，且$\boldsymbol{A}$对称，对角元全为正，则$\boldsymbol{A}$的特征值全是正数.
+        \end{th5}
+\end{enumerate}
+
+\textbf{Conclusions:}
+\begin{enumerate}
+    \item 若系数矩阵$\boldsymbol{A}$为\textbf{具有正对角元的对称阵}，则：$\boldsymbol{A}$和$2\boldsymbol{D}-\boldsymbol{A}$都正定$\ \Leftrightarrow\ $J方法收敛
+    \item 若系数矩阵$\boldsymbol{A}$为\textbf{对称正定}$\ \Rightarrow\ $GS方法收敛
+    \item 若系数矩阵$\boldsymbol{A}$为\textbf{对称正定，且$0<\omega<2$} $\ \Rightarrow\ $SOR方法收敛
+    \item 若系数矩阵$\boldsymbol{A}$为\textbf{严格对角占优矩阵}$\ \Rightarrow\ $J方法和GS方法都收敛
+    \item 若系数矩阵$\boldsymbol{A}$为\textbf{不可约对角占优矩阵}$\ \Rightarrow\ $J方法和GS方法都收敛
+    \item 若系数矩阵$\boldsymbol{A}$为\textbf{不可约对角占优矩阵，且$0<\omega\leqslant 1$} $\ \Rightarrow\ $SOR方法收敛
+\end{enumerate}
+
+
+\newpage
+\section{共轭梯度法*}
+
+
+% \end{document}
